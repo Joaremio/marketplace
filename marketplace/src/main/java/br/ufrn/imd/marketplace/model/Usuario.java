@@ -2,7 +2,6 @@ package br.ufrn.imd.marketplace.model;
 
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Usuario {
     private int id;
@@ -10,11 +9,21 @@ public class Usuario {
     private String cpf;
     private String email;
     private String senha;
-    private LocalDate data_cadastro;
+    private LocalDate dataCadastro;
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    private String telefone;
 
 
     public Usuario() {
-        this.data_cadastro = LocalDate.now();
+        this.dataCadastro = LocalDate.now();
     }
 
     public int getId() {
@@ -58,10 +67,10 @@ public class Usuario {
     }
 
     public LocalDate getDataCadastro() {
-        return data_cadastro;
+        return dataCadastro;
     }
 
     public void setDataCadastro(LocalDate dataCadastro) {
-        this.data_cadastro = dataCadastro;
+        this.dataCadastro = dataCadastro;
     }
 }
