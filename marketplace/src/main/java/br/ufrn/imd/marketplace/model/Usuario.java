@@ -11,6 +11,26 @@ public class Usuario {
     private String senha;
     private LocalDate dataCadastro;
 
+    public Usuario() {
+        this.dataCadastro = LocalDate.now();
+    }
+
+    public Usuario(int id,
+                   String nome,
+                   String cpf,
+                   String email,
+                   String senha,
+                   String telefone,
+                   LocalDate dataCadastro) {
+        this.id = id;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.email = email;
+        this.senha = senha;
+        this.telefone = telefone;
+        this.dataCadastro = dataCadastro;
+    }
+
     public String getTelefone() {
         return telefone;
     }
@@ -20,11 +40,6 @@ public class Usuario {
     }
 
     private String telefone;
-
-
-    public Usuario() {
-        this.dataCadastro = LocalDate.now();
-    }
 
     public int getId() {
         return id;

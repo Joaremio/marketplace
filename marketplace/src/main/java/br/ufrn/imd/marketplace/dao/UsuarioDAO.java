@@ -55,54 +55,55 @@ public class UsuarioDAO {
         String sql = "SELECT * FROM usuario WHERE id = ? ";
 
         try(Connection conn = dbConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()){
+            PreparedStatement stmt = conn.prepareStatement(sql);){
 
             stmt.setInt(1,id);
 
-            if(rs.next()){
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setNome(rs.getString("nome"));
-                usuario.setCpf(rs.getString("cpf"));
-                usuario.setEmail(rs.getString("email"));
-                usuario.setSenha(rs.getString("senha"));
-                usuario.setDataCadastro(rs.getObject("data_cadastro", LocalDate.class));
-                usuario.setTelefone(rs.getString("telefone"));
-                return usuario;
-            }else{
-                throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
+                }
+                return new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("email"),
+                        rs.getString("senha"),
+                        rs.getString("telefone"),
+                        rs.getObject("data_cadastro", LocalDate.class)
+                );
             }
         }catch(SQLException e){
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
-  }
+    }
     public List<Usuario> buscarUsuarios() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuario";
 
-        try(Connection conn = dbConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()){
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setNome(rs.getString("nome"));
-                usuario.setCpf(rs.getString("cpf"));
-                usuario.setEmail(rs.getString("email"));
-                usuario.setSenha(rs.getString("senha"));
-                usuario.setDataCadastro(rs.getObject("data_cadastro", LocalDate.class));
-                usuario.setTelefone(rs.getString("telefone"));
-                usuarios.add(usuario);
+                usuarios.add(new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("email"),
+                        rs.getString("senha"),
+                        rs.getString("telefone"),
+                        rs.getObject("data_cadastro", LocalDate.class)
+                ));
             }
 
-        return usuarios;
+            return usuarios;
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar usuários no banco de dados.", e);
         }
-  }
+    }
+
     public Usuario atualizarUsuario(int id , Usuario usuarioAtualizado){
         try(Connection conn = dbConnection.getConnection()){
             String sql = "UPDATE usuario SET nome = ?, cpf = ?, email = ?, senha = ?, telefone = ? WHERE id = ?";
