@@ -24,15 +24,11 @@ public class CompradorController {
 
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> inserirComprador(@PathVariable int usuarioId) {
-
         Usuario usuario = usuarioDAO.buscarUsuarioById(usuarioId);
-
         if(usuario == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-
         compradorDAO.inserirComprador(usuarioId);
-
         return ResponseEntity.noContent().build();
     }
 

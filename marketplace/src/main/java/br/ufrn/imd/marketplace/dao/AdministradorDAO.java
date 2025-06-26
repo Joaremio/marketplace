@@ -77,6 +77,25 @@ public class AdministradorDAO {
         }
     }
 
+    public void atualizarAnaliseVendedor(int usuarioId, int adminId, String novoStatus){
+        String sql = """
+        UPDATE vendedor
+        SET status = ?, administrador_usuario_id = ?, data_analise = ?
+        WHERE usuario_id = ?
+    """;
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, novoStatus); // "APROVADO" ou "REPROVADO"
+            stmt.setInt(2, adminId);
+            stmt.setObject(3, LocalDate.now());
+            stmt.setInt(4, usuarioId);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar status do vendedor", e);
+        }
+    }
 
 
 }
