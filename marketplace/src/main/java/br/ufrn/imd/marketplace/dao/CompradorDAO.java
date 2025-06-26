@@ -1,9 +1,12 @@
 package br.ufrn.imd.marketplace.dao;
 
+
 import br.ufrn.imd.marketplace.config.DB_Connection;
 import br.ufrn.imd.marketplace.model.Administrador;
+import br.ufrn.imd.marketplace.model.Comprador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,31 +17,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class AdministradorDAO {
+public class CompradorDAO {
 
     @Autowired
     private DB_Connection dbConnection;
 
-    public void inserirADM(int usuarioId){
-        String sql =  "INSERT INTO administrador(usuario_id) VALUES(?)";
+
+    public void inserirComprador(int usuarioId){
+        String sql =  "INSERT INTO comprador(usuario_id) VALUES(?)";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-             stmt.setInt(1, usuarioId);
-             stmt.executeUpdate();
+            stmt.setInt(1, usuarioId);
+            stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir administrador no banco de dados", e);
+            throw new RuntimeException("Erro ao inserir comprador no banco de dados", e);
         }
     }
 
-    public List<Administrador> getADMS() {
-        List<Administrador> adms = new ArrayList<>();
+    public List<Comprador> getCompradores() {
+        List<Comprador> compradores = new ArrayList<>();
         String sql = """
-        SELECT u.id, u.nome, u.cpf, u.email, u.senha, u.telefone, u.data_cadastro
-        FROM administrador a
-        JOIN usuario u ON u.id = a.usuario_id
+            SELECT u.id, u.nome, u.cpf, u.email, u.senha, u.telefone, u.data_cadastro
+            FROM comprador c
+            JOIN usuario u ON u.id = c.usuario_id
         """;
 
         try (Connection conn = dbConnection.getConnection();
@@ -46,7 +50,7 @@ public class AdministradorDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                adms.add(new Administrador(
+                compradores.add(new Comprador(
                         rs.getInt("id"),
                         rs.getString("nome"),
                         rs.getString("cpf"),
@@ -57,15 +61,15 @@ public class AdministradorDAO {
                 ));
             }
 
-            return adms;
+            return compradores;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar administradores no banco de dados.", e);
+            throw new RuntimeException("Erro ao buscar compradores no banco de dados.", e);
         }
     }
 
-    public void removerADM(int usuarioId){
-        String sql = "DELETE FROM administrador WHERE usuario_id = ?";
+    public void removerComprador(int usuarioId){
+        String sql = "DELETE FROM comprador WHERE usuario_id = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -73,10 +77,10 @@ public class AdministradorDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao remover administrador no banco de dados", e);
+            throw new RuntimeException("Erro ao remover comprador no banco de dados", e);
         }
     }
-
-
-
 }
+
+
+
