@@ -1,17 +1,12 @@
 package br.ufrn.imd.marketplace.controller;
 
-
-import br.ufrn.imd.marketplace.dao.UsuarioDAO;
-import br.ufrn.imd.marketplace.dao.VendedorDAO;
-import br.ufrn.imd.marketplace.model.Usuario;
 import br.ufrn.imd.marketplace.model.Vendedor;
-import org.apache.coyote.Response;
+import br.ufrn.imd.marketplace.service.VendedorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,29 +14,29 @@ import java.util.List;
 public class VendedorController {
 
     @Autowired
-    private VendedorDAO vendedorDAO;
-
-    @Autowired
-    private UsuarioDAO usuarioDAO;
-
+    private VendedorService vendedorService;
 
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> solicitarVendedor(@PathVariable int usuarioId){
-        Usuario usuario =  usuarioDAO.buscarUsuarioById(usuarioId);
-        if(usuario == null){
-            return ResponseEntity.notFound().build();
+        try {
+            vendedorService.solicitarVendedor(usuarioId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("não encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        vendedorDAO.inserirVendedor(usuarioId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<?> listarVendedores() {
-        try{
-            List<Vendedor> vendedores = vendedorDAO.getVendedores();
+        try {
+            List<Vendedor> vendedores = vendedorService.listarVendedores();
             return ResponseEntity.ok(vendedores);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao listar vendedores: " + e.getMessage());
         }
     }
 }

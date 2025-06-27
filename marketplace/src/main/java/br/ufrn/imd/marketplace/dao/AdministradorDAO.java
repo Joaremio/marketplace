@@ -96,6 +96,4 @@ public class AdministradorDAO {
             throw new RuntimeException("Erro ao atualizar status do vendedor", e);
         }
     }
-
-
 }

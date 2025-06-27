@@ -1,17 +1,11 @@
 package br.ufrn.imd.marketplace.dao;
 
-
 import br.ufrn.imd.marketplace.config.DB_Connection;
-import br.ufrn.imd.marketplace.model.Administrador;
 import br.ufrn.imd.marketplace.model.Comprador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +16,8 @@ public class CompradorDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-
-    public void inserirComprador(int usuarioId){
-        String sql =  "INSERT INTO comprador(usuario_id) VALUES(?)";
+    public void inserirComprador(int usuarioId) {
+        String sql = "INSERT INTO comprador (usuario_id) VALUES (?)";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -68,8 +61,9 @@ public class CompradorDAO {
         }
     }
 
-    public void removerComprador(int usuarioId){
+    public void removerComprador(int usuarioId) {
         String sql = "DELETE FROM comprador WHERE usuario_id = ?";
+
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -81,6 +75,5 @@ public class CompradorDAO {
         }
     }
 }
-
 
 

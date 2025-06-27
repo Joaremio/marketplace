@@ -1,11 +1,7 @@
 package br.ufrn.imd.marketplace.controller;
 
-
-import br.ufrn.imd.marketplace.dao.CompradorDAO;
-import br.ufrn.imd.marketplace.dao.UsuarioDAO;
-import br.ufrn.imd.marketplace.model.Administrador;
 import br.ufrn.imd.marketplace.model.Comprador;
-import br.ufrn.imd.marketplace.model.Usuario;
+import br.ufrn.imd.marketplace.service.CompradorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,40 +14,42 @@ import java.util.List;
 public class CompradorController {
 
     @Autowired
-    private CompradorDAO compradorDAO;
-    @Autowired
-    private UsuarioDAO usuarioDAO;
+    private CompradorService compradorService;
 
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> inserirComprador(@PathVariable int usuarioId) {
-        Usuario usuario = usuarioDAO.buscarUsuarioById(usuarioId);
-        if(usuario == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        try {
+            compradorService.inserirComprador(usuarioId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("não encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        compradorDAO.inserirComprador(usuarioId);
-        return ResponseEntity.noContent().build();
     }
 
-
-    //usuarios que também são compradores
     @GetMapping
     public ResponseEntity<?> listarCompradores() {
         try {
-            List<Comprador> compradores = compradorDAO.getCompradores();
+            List<Comprador> compradores = compradorService.listarCompradores();
             return ResponseEntity.ok(compradores);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao listar administradores: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao listar compradores: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{usuarioId}")
-    public ResponseEntity<?> deletarAdministrador(@PathVariable int usuarioId) {
+    public ResponseEntity<?> deletarComprador(@PathVariable int usuarioId) {
         try {
-            compradorDAO.removerComprador(usuarioId);
+            compradorService.deletarComprador(usuarioId);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao deletar comprador: " + e.getMessage());
         }
     }
-
 }
+
+
