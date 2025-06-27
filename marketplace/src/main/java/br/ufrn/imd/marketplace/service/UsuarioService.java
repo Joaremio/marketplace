@@ -24,6 +24,7 @@ public class UsuarioService {
             compradorService.inserirComprador(usuarioSalvo.getId());
             return usuarioSalvo;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("Erro ao cadastrar usuário", e);
         }
     }

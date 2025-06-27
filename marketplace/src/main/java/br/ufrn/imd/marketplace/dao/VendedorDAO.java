@@ -18,16 +18,15 @@ public class VendedorDAO {
 
     public void inserirVendedor(int usuarioId) {
         String sql = """
-            INSERT INTO vendedor (usuario_id, status, data_analise)
-            VALUES (?, ?, ?)
+            INSERT INTO vendedor (usuario_id, data_analise)
+            VALUES (?, ?)
         """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, usuarioId);
-            stmt.setString(2, "EM_ANALISE");
-            stmt.setObject(3, LocalDate.now());
+            stmt.setObject(2, LocalDate.now());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
