@@ -34,4 +34,16 @@ public class VendedorService {
     public List<Vendedor> listarVendedores() {
         return vendedorDAO.getVendedores();
     }
+
+    public Vendedor buscarVendedorPorId(int id) {
+        Vendedor vendedor = vendedorDAO.getVendedorById(id);
+        if (vendedor == null) {
+            throw new RuntimeException("Vendedor com ID " + id + " não encontrado.");
+        }
+        return vendedor;
+    }
+
+    public void excluirVendedor(int id) {
+        vendedorDAO.excluirVendedor(id);
+    }
 }

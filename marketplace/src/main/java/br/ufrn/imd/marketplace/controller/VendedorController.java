@@ -39,4 +39,24 @@ public class VendedorController {
                     .body("Erro ao listar vendedores: " + e.getMessage());
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarVendedorPorId(@PathVariable int id){
+        try{
+            Vendedor vendedor = vendedorService.buscarVendedorPorId(id);
+            return ResponseEntity.ok(vendedor);
+        }catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluirVendedor(@PathVariable int id){
+        try{
+            vendedorService.excluirVendedor(id);
+            return ResponseEntity.noContent().build();
+        }catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
