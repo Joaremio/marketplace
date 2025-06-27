@@ -14,10 +14,15 @@ public class UsuarioService {
     @Autowired
     private UsuarioDAO usuarioDAO;
 
+    @Autowired
+    private CompradorService compradorService;
+
     public Usuario cadastrarUsuario(Usuario usuario) {
         try {
             usuario.setDataCadastro(LocalDate.now());
-            return usuarioDAO.inserirUsuario(usuario);
+            Usuario usuarioSalvo = usuarioDAO.inserirUsuario(usuario);
+            compradorService.inserirComprador(usuarioSalvo.getId());
+            return usuarioSalvo;
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao cadastrar usuário", e);
         }
@@ -63,6 +68,7 @@ public class UsuarioService {
                 throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("Erro ao deletar usuário", e);
         }
     }
