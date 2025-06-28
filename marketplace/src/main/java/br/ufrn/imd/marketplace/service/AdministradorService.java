@@ -33,17 +33,32 @@ public class AdministradorService {
 
 
     public List<Administrador> listarAdministradores() {
-        return administradorDAO.getADMS();
+        try{
+            return administradorDAO.getADMS();
+        }catch(SQLException e){
+            throw new RuntimeException("Erro ao buscar administradores", e);
+        }
     }
 
     public void deletarAdministrador(int usuarioId) {
-        administradorDAO.removerADM(usuarioId);
+        try{
+            administradorDAO.removerADM(usuarioId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar administrador", e);
+        }
+
     }
 
     public void analisarVendedor(int usuarioId, int adminId, String status) {
-        if (!status.equalsIgnoreCase("APROVADO") && !status.equalsIgnoreCase("REPROVADO")) {
-            throw new IllegalArgumentException("Status inválido. Use 'APROVADO' ou 'REPROVADO'.");
+        try{
+            if (!status.equalsIgnoreCase("APROVADO") && !status.equalsIgnoreCase("REPROVADO")) {
+                throw new IllegalArgumentException("Status inválido. Use 'APROVADO' ou 'REPROVADO'.");
+            }
+            administradorDAO.atualizarAnaliseVendedor(usuarioId, adminId, status.toUpperCase());
+        }catch(SQLException e){
+            throw new RuntimeException("Erro ao analisar vendedor", e);
         }
-        administradorDAO.atualizarAnaliseVendedor(usuarioId, adminId, status.toUpperCase());
+
     }
 }
+

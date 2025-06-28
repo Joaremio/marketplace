@@ -16,7 +16,7 @@ public class VendedorDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    public void inserirVendedor(int usuarioId) {
+    public void inserirVendedor(int usuarioId) throws SQLException {
         String sql = """
             INSERT INTO vendedor (usuario_id, data_analise)
             VALUES (?, ?)
@@ -24,17 +24,13 @@ public class VendedorDAO {
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, usuarioId);
             stmt.setObject(2, LocalDate.now());
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir vendedor no banco de dados.", e);
         }
     }
 
-    public List<Vendedor> getVendedores() {
+    public List<Vendedor> getVendedores() throws SQLException {
         List<Vendedor> vendedores = new ArrayList<>();
         String sql = """
             SELECT u.id, u.nome, u.cpf, u.email, u.senha, u.telefone, u.data_cadastro,
@@ -61,15 +57,11 @@ public class VendedorDAO {
                 );
                 vendedores.add(vendedor);
             }
-
             return vendedores;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar vendedores no banco de dados.", e);
         }
     }
 
-    public Vendedor getVendedorById(int id) {
+    public Vendedor getVendedorById(int id) throws SQLException {
         String sql = """
         SELECT u.id, u.nome, u.cpf, u.email, u.senha, u.telefone, u.data_cadastro,
                v.status, v.data_analise
@@ -100,13 +92,10 @@ public class VendedorDAO {
                     return null; // ou lance exceção se preferir
                 }
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar vendedor por ID", e);
         }
     }
 
-    public void excluirVendedor(int id) {
+    public void excluirVendedor(int id)  throws SQLException {
         String sql = "DELETE FROM vendedor WHERE usuario_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -118,9 +107,6 @@ public class VendedorDAO {
             if (rowsAffected == 0) {
                 throw new RuntimeException("Vendedor com ID " + id + " não encontrado para exclusão.");
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao excluir vendedor: " + e.getMessage(), e);
         }
     }
 }

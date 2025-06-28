@@ -16,7 +16,7 @@ public class CompradorDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    public void inserirComprador(int usuarioId) {
+    public void inserirComprador(int usuarioId) throws SQLException {
         String sql = "INSERT INTO comprador (usuario_id) VALUES (?)";
 
         try (Connection conn = dbConnection.getConnection();
@@ -24,13 +24,10 @@ public class CompradorDAO {
 
             stmt.setInt(1, usuarioId);
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir comprador no banco de dados", e);
         }
     }
 
-    public List<Comprador> getCompradores() {
+    public List<Comprador> getCompradores() throws SQLException {
         List<Comprador> compradores = new ArrayList<>();
         String sql = """
             SELECT u.id, u.nome, u.cpf, u.email, u.senha, u.telefone, u.data_cadastro
@@ -53,15 +50,11 @@ public class CompradorDAO {
                         rs.getObject("data_cadastro", LocalDate.class)
                 ));
             }
-
             return compradores;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar compradores no banco de dados.", e);
         }
     }
 
-    public void removerComprador(int usuarioId) {
+    public void removerComprador(int usuarioId) throws SQLException {
         String sql = "DELETE FROM comprador WHERE usuario_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -69,9 +62,6 @@ public class CompradorDAO {
 
             stmt.setInt(1, usuarioId);
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao remover comprador no banco de dados", e);
         }
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,15 +28,14 @@ public class UsuarioController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("message", e.getMessage());
-            
-            // Verificar o tipo específico do erro
+
             if (e.getMessage().contains("CPF")) {
                 errorResponse.put("field", "cpf");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-            } else if (e.getMessage().contains("email") || e.getMessage().contains("Email")) {
+            } else if (e.getMessage().toLowerCase().contains("email")) {
                 errorResponse.put("field", "email");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-            } else if (e.getMessage().contains("Telefone") || e.getMessage().contains("telefone")) {
+            } else if (e.getMessage().toLowerCase().contains("telefone")) {
                 errorResponse.put("field", "telefone");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
             } else {
@@ -80,7 +80,6 @@ public class UsuarioController {
     @GetMapping("/verificar-telefone")
     public ResponseEntity<?> verificarTelefone(@RequestParam String telefone) {
         try {
-            // Remove formatação do telefone para comparação
             String telefoneFormatado = telefone.replaceAll("\\D", "");
             boolean existe = usuarioService.existePorTelefone(telefoneFormatado);
             Map<String, Object> response = new HashMap<>();
@@ -96,45 +95,25 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUsuarioById(@PathVariable int id) {
-        try {
-            Usuario usuario = usuarioService.buscarPorId(id);
-            return ResponseEntity.ok(usuario);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Erro: " + e.getMessage());
-        }
+        Usuario usuario = usuarioService.buscarPorId(id);
+        return ResponseEntity.ok(usuario);
     }
 
     @GetMapping
     public ResponseEntity<?> listarUsuarios() {
-        try {
-            List<Usuario> usuarios = usuarioService.listarTodos();
-            return ResponseEntity.ok(usuarios);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao listar usuários: " + e.getMessage());
-        }
+        List<Usuario> usuarios = usuarioService.listarTodos();
+        return ResponseEntity.ok(usuarios);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarUsuario(@PathVariable int id, @RequestBody Usuario usuarioAtualizado) {
-        try {
-            Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioAtualizado);
-            return ResponseEntity.ok(atualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Erro ao atualizar usuário: " + e.getMessage());
-        }
+        Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioAtualizado);
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarUsuario(@PathVariable int id) {
-        try {
-            usuarioService.deletarUsuario(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Erro ao deletar usuário: " + e.getMessage());
-        }
+        usuarioService.deletarUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 }

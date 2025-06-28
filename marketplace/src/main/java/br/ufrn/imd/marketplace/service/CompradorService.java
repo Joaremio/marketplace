@@ -32,10 +32,10 @@ public class CompradorService {
     }
 
     public List<Comprador> listarCompradores() {
-        return compradorDAO.getCompradores();
+        try{return compradorDAO.getCompradores();} catch (SQLException e) {throw new RuntimeException(e);}
     }
 
     public void deletarComprador(int usuarioId) {
-        compradorDAO.removerComprador(usuarioId);
+        try{compradorDAO.removerComprador(usuarioId);} catch (SQLException e) {throw new RuntimeException(e);}
     }
 }
