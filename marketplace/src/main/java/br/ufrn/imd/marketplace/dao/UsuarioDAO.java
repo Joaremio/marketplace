@@ -46,6 +46,114 @@ public class UsuarioDAO {
         }
     }
 
+    // Método para verificar se CPF já existe
+    public boolean existeCpf(String cpf) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE cpf = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, cpf);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+                return false;
+            }
+        }
+    }
+
+    // Método para verificar se email já existe
+    public boolean existeEmail(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, email);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+                return false;
+            }
+        }
+    }
+
+    // Método para verificar se telefone já existe
+    public boolean existeTelefone(String telefone) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE telefone = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, telefone);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+                return false;
+            }
+        }
+    }
+
+    // Método para buscar usuário por CPF
+    public Usuario buscarUsuarioPorCpf(String cpf) throws SQLException {
+        String sql = "SELECT * FROM usuario WHERE cpf = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, cpf);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Usuario(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getString("cpf"),
+                            rs.getString("email"),
+                            rs.getString("senha"),
+                            rs.getString("telefone"),
+                            rs.getObject("data_cadastro", LocalDate.class)
+                    );
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    // Método para buscar usuário por email
+    public Usuario buscarUsuarioPorEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM usuario WHERE email = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Usuario(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getString("cpf"),
+                            rs.getString("email"),
+                            rs.getString("senha"),
+                            rs.getString("telefone"),
+                            rs.getObject("data_cadastro", LocalDate.class)
+                    );
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+
     public Usuario buscarUsuarioById(int id) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id = ?";
 
@@ -124,4 +232,3 @@ public class UsuarioDAO {
         }
     }
 }
-

@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -22,8 +24,73 @@ public class UsuarioController {
             Usuario novoUsuario = usuarioService.cadastrarUsuario(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao cadastrar usuário: " + e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            
+            // Verificar o tipo específico do erro
+            if (e.getMessage().contains("CPF")) {
+                errorResponse.put("field", "cpf");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            } else if (e.getMessage().contains("email") || e.getMessage().contains("Email")) {
+                errorResponse.put("field", "email");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            } else if (e.getMessage().contains("Telefone") || e.getMessage().contains("telefone")) {
+                errorResponse.put("field", "telefone");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            }
+        }
+    }
+
+    // Endpoint para verificar se CPF já existe
+    @GetMapping("/verificar-cpf/{cpf}")
+    public ResponseEntity<?> verificarCpf(@PathVariable String cpf) {
+        try {
+            boolean existe = usuarioService.existePorCpf(cpf.replaceAll("\\D", ""));
+            Map<String, Object> response = new HashMap<>();
+            response.put("exists", existe);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Erro ao verificar CPF");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // Endpoint para verificar se email já existe
+    @GetMapping("/verificar-email")
+    public ResponseEntity<?> verificarEmail(@RequestParam String email) {
+        try {
+            boolean existe = usuarioService.existePorEmail(email);
+            Map<String, Object> response = new HashMap<>();
+            response.put("exists", existe);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Erro ao verificar email");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // Endpoint para verificar se telefone já existe
+    @GetMapping("/verificar-telefone")
+    public ResponseEntity<?> verificarTelefone(@RequestParam String telefone) {
+        try {
+            // Remove formatação do telefone para comparação
+            String telefoneFormatado = telefone.replaceAll("\\D", "");
+            boolean existe = usuarioService.existePorTelefone(telefoneFormatado);
+            Map<String, Object> response = new HashMap<>();
+            response.put("exists", existe);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Erro ao verificar telefone");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
