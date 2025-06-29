@@ -70,7 +70,7 @@ public class AdministradorDAO {
     public void atualizarAnaliseVendedor(int usuarioId, int adminId, String novoStatus) throws SQLException {
         String sql = """
         UPDATE vendedor
-        SET status = ?, administrador_usuario_id = ?, data_analise = ?
+        SET status = ?, administrador_id = ?, data_analise = ?
         WHERE usuario_id = ?
     """;
 
