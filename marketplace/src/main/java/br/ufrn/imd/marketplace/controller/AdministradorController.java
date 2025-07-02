@@ -41,4 +41,6 @@ public class AdministradorController {
         administradorService.analisarVendedor(usuarioId, adminId, status);
         return ResponseEntity.noContent().build();
     }
+
+
 }
