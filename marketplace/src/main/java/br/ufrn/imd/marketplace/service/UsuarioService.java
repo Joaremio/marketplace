@@ -3,6 +3,7 @@ package br.ufrn.imd.marketplace.service;
 import br.ufrn.imd.marketplace.dao.UsuarioDAO;
 import br.ufrn.imd.marketplace.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder; // 1. IMPORTAR
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -16,6 +17,9 @@ public class UsuarioService {
 
     @Autowired
     private CompradorService compradorService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Usuario cadastrarUsuario(Usuario usuario) {
         try {
@@ -34,7 +38,8 @@ public class UsuarioService {
                 throw new RuntimeException("Telefone já está cadastrado no sistema");
             }
             
-            // Se chegou até aqui, pode cadastrar
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+            
             usuario.setDataCadastro(LocalDate.now());
             Usuario usuarioSalvo = usuarioDAO.inserirUsuario(usuario);
             compradorService.inserirComprador(usuarioSalvo.getId());
@@ -45,7 +50,6 @@ public class UsuarioService {
         }
     }
 
-    // Métodos para validação em tempo real
     public boolean existePorCpf(String cpf) {
         try {
             return usuarioDAO.existeCpf(cpf);
@@ -70,7 +74,6 @@ public class UsuarioService {
         }
     }
 
-    // Métodos úteis para buscar usuários (útil para login)
     public Usuario buscarPorCpf(String cpf) {
         try {
             Usuario usuario = usuarioDAO.buscarUsuarioPorCpf(cpf);
@@ -87,7 +90,7 @@ public class UsuarioService {
         try {
             Usuario usuario = usuarioDAO.buscarUsuarioPorEmail(email);
             if (usuario == null) {
-                throw new RuntimeException("Usuário com email " + email + " não encontrado.");
+                return null; 
             }
             return usuario;
         } catch (SQLException e) {
@@ -117,31 +120,35 @@ public class UsuarioService {
 
     public Usuario atualizarUsuario(int id, Usuario usuarioAtualizado) {
         try {
-            // Buscar usuário existente para verificar se email/CPF/telefone mudaram
             Usuario usuarioExistente = usuarioDAO.buscarUsuarioById(id);
             if (usuarioExistente == null) {
                 throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
             }
 
-            // Verificar se CPF foi alterado e se já existe
             if (!usuarioExistente.getCpf().equals(usuarioAtualizado.getCpf())) {
                 if (usuarioDAO.existeCpf(usuarioAtualizado.getCpf())) {
                     throw new RuntimeException("CPF já está cadastrado no sistema");
                 }
             }
 
-            // Verificar se email foi alterado e se já existe
             if (!usuarioExistente.getEmail().equals(usuarioAtualizado.getEmail())) {
                 if (usuarioDAO.existeEmail(usuarioAtualizado.getEmail())) {
                     throw new RuntimeException("Email já está cadastrado no sistema");
                 }
             }
 
-            // Verificar se telefone foi alterado e se já existe
             if (!usuarioExistente.getTelefone().equals(usuarioAtualizado.getTelefone())) {
                 if (usuarioDAO.existeTelefone(usuarioAtualizado.getTelefone())) {
                     throw new RuntimeException("Telefone já está cadastrado no sistema");
                 }
+            }
+            
+            // Lógica para atualizar a senha, se necessário
+            if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
+                usuarioAtualizado.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+            } else {
+                // Mantém a senha antiga se nenhuma nova for fornecida
+                usuarioAtualizado.setSenha(usuarioExistente.getSenha());
             }
 
             boolean atualizado = usuarioDAO.atualizarUsuario(id, usuarioAtualizado);

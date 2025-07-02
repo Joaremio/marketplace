@@ -1,6 +1,8 @@
 package br.ufrn.imd.marketplace.controller;
 
+import br.ufrn.imd.marketplace.dto.LoginRequest;
 import br.ufrn.imd.marketplace.model.Usuario;
+import br.ufrn.imd.marketplace.service.AuthService;
 import br.ufrn.imd.marketplace.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import java.util.Map;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
+    @Autowired
+    private AuthService authService;
     @Autowired
     private UsuarioService usuarioService;
 
@@ -41,6 +45,19 @@ public class UsuarioController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }
+        }
+    }
+
+    // Endpoint de Login
+    @PostMapping("/login")
+    public ResponseEntity<?> autenticarUsuario(@RequestBody LoginRequest loginRequest) {
+        try {
+            String token = authService.autenticar(loginRequest.getEmail(), loginRequest.getSenha());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 

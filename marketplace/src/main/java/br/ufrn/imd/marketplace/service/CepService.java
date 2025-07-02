@@ -1,6 +1,4 @@
 package br.ufrn.imd.marketplace.service;
-
-
 import br.ufrn.imd.marketplace.dao.CepDAO;
 import br.ufrn.imd.marketplace.dao.UsuarioDAO;
 import br.ufrn.imd.marketplace.model.Cep;
