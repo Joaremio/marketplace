@@ -127,5 +127,33 @@ public class VendedorDAO {
         return status;
     }
 
+    public List<Vendedor> getVendedoresPorStatus(String status) throws SQLException {
+    List<Vendedor> vendedores = new ArrayList<>();
+    String sql = """
+        SELECT u.id, u.nome, u.cpf, u.email, u.data_cadastro, v.status, v.data_analise, u.telefone
+        FROM vendedor v
+        JOIN usuario u ON u.id = v.usuario_id
+        WHERE v.status = ?
+    """;
+
+    try (Connection conn = dbConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, status);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Vendedor vendedor = new Vendedor(
+                    rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"),
+                    rs.getString("email"), null, /* senha não é necessária aqui */
+                    rs.getString("telefone"), rs.getObject("data_cadastro", LocalDate.class),
+                    rs.getString("status"), rs.getObject("data_analise", LocalDate.class)
+            );
+            vendedores.add(vendedor);
+        }
+        return vendedores;
+    }
+}
+
 }
 
