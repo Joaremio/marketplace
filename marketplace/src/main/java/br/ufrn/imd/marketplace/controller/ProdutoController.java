@@ -46,7 +46,7 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.OK).body(produtoService.atualizarProduto(produtoId, vendedorId, produto));
     }
 
-    @DeleteMapping("/produtoId")
+    @DeleteMapping("/{produtoId}")
     public ResponseEntity<?> removerProduto(@PathVariable int produtoId) {
         produtoService.deletarProduto(produtoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
