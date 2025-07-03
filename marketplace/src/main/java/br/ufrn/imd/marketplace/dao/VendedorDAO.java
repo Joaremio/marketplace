@@ -95,7 +95,7 @@ public class VendedorDAO {
         }
     }
 
-    public void excluirVendedor(int id)  throws SQLException {
+    public void excluirVendedor(int id) throws SQLException {
         String sql = "DELETE FROM vendedor WHERE usuario_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -109,5 +109,23 @@ public class VendedorDAO {
             }
         }
     }
+
+    public String getVendedorStatus(int vendedorId) throws SQLException{
+        String status = null;
+        String sql = "SELECT status FROM vendedor WHERE usuario_id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, vendedorId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    status = rs.getString("status");
+                }
+            }
+        }
+        return status;
+    }
+
 }
 

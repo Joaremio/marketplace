@@ -34,9 +34,18 @@ public class VendedorController {
             return ResponseEntity.ok(vendedor);
     }
 
+    @GetMapping("/status/{vendedorId}")
+    public ResponseEntity<?> getStatusVendedor(@PathVariable int vendedorId){
+        String status = vendedorService.getVendedorStatus(vendedorId);
+        return ResponseEntity.ok(status);
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirVendedor(@PathVariable int id){
             vendedorService.excluirVendedor(id);
             return ResponseEntity.noContent().build();
     }
+
+
 }

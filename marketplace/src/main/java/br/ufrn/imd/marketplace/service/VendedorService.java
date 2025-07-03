@@ -70,4 +70,12 @@ public class VendedorService {
             throw new RuntimeException(e);
         }
     }
+
+    public String getVendedorStatus(int vendedorId){
+        try{
+            return vendedorDAO.getVendedorStatus(vendedorId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
