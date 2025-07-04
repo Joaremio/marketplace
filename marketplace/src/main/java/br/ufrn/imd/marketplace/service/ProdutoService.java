@@ -2,6 +2,7 @@ package br.ufrn.imd.marketplace.service;
 
 
 import br.ufrn.imd.marketplace.dao.ProdutoDAO;
+import br.ufrn.imd.marketplace.dto.ProdutoImagemDTO;
 import br.ufrn.imd.marketplace.model.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class ProdutoService {
     private ProdutoDAO produtoDAO;
 
 
-    public Produto cadastrarProduto(int vendedorId, Produto produto) {
+    public ProdutoImagemDTO cadastrarProduto(int vendedorId, ProdutoImagemDTO produto) {
         try{
            return produtoDAO.cadastrarProduto(vendedorId, produto);
         } catch (SQLException e) {
@@ -24,9 +25,9 @@ public class ProdutoService {
         }
     }
 
-    public List<Produto> buscarProdutosPorVendedor(int vendedorId) {
+    public List<ProdutoImagemDTO> buscarProdutosPorVendedor(int vendedorId) {
         try{
-            List<Produto> produtos = produtoDAO.buscarProdutosPorVendedor(vendedorId);
+            List<ProdutoImagemDTO> produtos = produtoDAO.buscarProdutosPorVendedor(vendedorId);
             if(produtos.isEmpty()){
                 throw new RuntimeException("Vendedor nao possui produtos cadastrados.");
             }
@@ -59,9 +60,9 @@ public class ProdutoService {
         }
     }
 
-    public Produto atualizarProduto(int produtoId, int vendedorId, Produto produtoAtualizado){
+    public ProdutoImagemDTO atualizarProduto(int produtoId, int vendedorId, ProdutoImagemDTO produtoAtualizado){
         try{
-            Produto produto = produtoDAO.atualizarProduto(produtoId, vendedorId, produtoAtualizado);
+            ProdutoImagemDTO produto = produtoDAO.atualizarProduto(produtoId, vendedorId, produtoAtualizado);
             if(produto == null){
                 throw new RuntimeException("Produto não encontrado ou não pertence ao vendedor.");
             }

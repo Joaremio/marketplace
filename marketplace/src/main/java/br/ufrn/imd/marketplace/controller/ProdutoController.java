@@ -2,6 +2,7 @@ package br.ufrn.imd.marketplace.controller;
 
 
 import br.ufrn.imd.marketplace.dao.ProdutoDAO;
+import br.ufrn.imd.marketplace.dto.ProdutoImagemDTO;
 import br.ufrn.imd.marketplace.model.Produto;
 import br.ufrn.imd.marketplace.service.ProdutoService;
 import org.apache.coyote.Response;
@@ -20,8 +21,8 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @PostMapping("/{vendedorId}")
-    public ResponseEntity<?> cadastrarProduto(@PathVariable int vendedorId, @RequestBody Produto produto) {
-        Produto produtoCadastrado = produtoService.cadastrarProduto(vendedorId, produto);
+    public ResponseEntity<?> cadastrarProduto(@PathVariable int vendedorId, @RequestBody ProdutoImagemDTO produto) {
+        ProdutoImagemDTO produtoCadastrado = produtoService.cadastrarProduto(vendedorId, produto);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoCadastrado);
     }
 
@@ -42,7 +43,7 @@ public class ProdutoController {
     }
 
     @PutMapping("/atualizar/{produtoId}/{vendedorId}")
-    public ResponseEntity<?> atualizarProduto(@PathVariable int produtoId, @PathVariable int vendedorId, @RequestBody Produto produto) {
+    public ResponseEntity<?> atualizarProduto(@PathVariable int produtoId, @PathVariable int vendedorId, @RequestBody ProdutoImagemDTO produto) {
         return ResponseEntity.status(HttpStatus.OK).body(produtoService.atualizarProduto(produtoId, vendedorId, produto));
     }
 
@@ -51,5 +52,6 @@ public class ProdutoController {
         produtoService.deletarProduto(produtoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 
 }

@@ -18,9 +18,9 @@ public class ImagemDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    public void salvarImagem(Imagem imagem) throws SQLException {
+    public void salvarImagem(Connection conn, Imagem imagem) throws SQLException {
         String sql = "INSERT INTO imagem (imagem, produto_id) VALUES (?, ?)";
-        try(Connection conn = dbConnection.getConnection();
+        try(
             PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1, imagem.getImagemCaminho());
             stmt.setInt(2, imagem.getProdutoId());
@@ -50,9 +50,9 @@ public class ImagemDAO {
         return imagens;
     }
 
-    public boolean deletarImagensDoProduto(int produtoId) throws SQLException {
+    public boolean deletarImagensDoProduto(Connection conn, int produtoId) throws SQLException {
         String sql = "DELETE FROM imagem WHERE produto_id = ?";
-        try (Connection conn = dbConnection.getConnection();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, produtoId);
             int linhasAfetadas = stmt.executeUpdate();

@@ -15,11 +15,10 @@ public class UsuarioDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    public Usuario inserirUsuario(Usuario usuario) throws SQLException {
+    public Usuario inserirUsuario(Connection conn, Usuario usuario) throws SQLException {
         String sql = "INSERT INTO usuario (nome, cpf, email, senha, data_cadastro, telefone) VALUES (?,?,?,?,?,?)";
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getCpf());
@@ -47,11 +46,10 @@ public class UsuarioDAO {
     }
 
     // Método para verificar se CPF já existe
-    public boolean existeCpf(String cpf) throws SQLException {
+    public boolean existeCpf(Connection conn, String cpf) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE cpf = ?";
         
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, cpf);
             
@@ -65,11 +63,10 @@ public class UsuarioDAO {
     }
 
     // Método para verificar se email já existe
-    public boolean existeEmail(String email) throws SQLException {
+    public boolean existeEmail(Connection conn, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
         
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, email);
             
@@ -83,11 +80,10 @@ public class UsuarioDAO {
     }
 
     // Método para verificar se telefone já existe
-    public boolean existeTelefone(String telefone) throws SQLException {
+    public boolean existeTelefone(Connection conn ,String telefone) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE telefone = ?";
         
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, telefone);
             
