@@ -16,11 +16,10 @@ public class CompradorDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    public void inserirComprador(int usuarioId) throws SQLException {
+    public void inserirComprador(Connection conn, int usuarioId) throws SQLException {
         String sql = "INSERT INTO comprador (usuario_id) VALUES (?)";
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, usuarioId);
             stmt.executeUpdate();

@@ -11,14 +11,13 @@ public class Produto {
     private boolean ativo;
     private String categoria;
 
-    public Produto(int id, int vendedorId, String nome, Double preco, String descricao, int estoque, boolean ativo, String categoria) {
+    public Produto(int id, int vendedorId, String nome, Double preco, String descricao, int estoque, String categoria) {
         this.id = id;
         this.vendedorId = vendedorId;
         this.nome = nome;
         this.preco = preco;
         this.descricao = descricao;
         this.estoque = estoque;
-        this.ativo = ativo;
         this.categoria = categoria;
     }
     public Produto(){}

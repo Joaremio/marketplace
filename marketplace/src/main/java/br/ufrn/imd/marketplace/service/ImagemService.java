@@ -1,11 +1,13 @@
 package br.ufrn.imd.marketplace.service;
 
 
+import br.ufrn.imd.marketplace.config.DB_Connection;
 import br.ufrn.imd.marketplace.dao.ImagemDAO;
 import br.ufrn.imd.marketplace.model.Imagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,9 +16,14 @@ public class ImagemService {
     @Autowired
     private ImagemDAO imagemDAO;
 
+    @Autowired
+    private DB_Connection dbConnection;
+
+
     public void salvarImagem(Imagem imagem)  {
         try{
-            imagemDAO.salvarImagem(imagem);
+            Connection conn = dbConnection.getConnection();
+            imagemDAO.salvarImagem(conn,imagem);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -35,7 +42,8 @@ public class ImagemService {
 
     public void excluirTodasImagens(int idProduto) {
         try{
-            imagemDAO.deletarImagensDoProduto(idProduto);
+            Connection conn = dbConnection.getConnection();
+            imagemDAO.deletarImagensDoProduto(conn,idProduto);
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -1,11 +1,15 @@
 package br.ufrn.imd.marketplace.service;
 
+import br.ufrn.imd.marketplace.config.DB_Connection;
+import br.ufrn.imd.marketplace.dao.CarrinhoDAO;
+import br.ufrn.imd.marketplace.dao.CompradorDAO;
 import br.ufrn.imd.marketplace.dao.UsuarioDAO;
 import br.ufrn.imd.marketplace.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder; // 1. IMPORTAR
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,43 +20,74 @@ public class UsuarioService {
     private UsuarioDAO usuarioDAO;
 
     @Autowired
-    private CompradorService compradorService;
+    private CarrinhoDAO carrinhoDAO;
+
+    @Autowired
+    private CompradorDAO compradorDAO;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private DB_Connection dbConnection;
+
     public Usuario cadastrarUsuario(Usuario usuario) {
+        Connection conn = null;
         try {
-            // Verificar se CPF já existe
-            if (usuarioDAO.existeCpf(usuario.getCpf())) {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // 🔁 Início da transação
+
+            // Verificações de duplicidade
+            if (usuarioDAO.existeCpf(conn, usuario.getCpf())) {
                 throw new RuntimeException("CPF já está cadastrado no sistema");
             }
-            
-            // Verificar se email já existe
-            if (usuarioDAO.existeEmail(usuario.getEmail())) {
+            if (usuarioDAO.existeEmail(conn, usuario.getEmail())) {
                 throw new RuntimeException("Email já está cadastrado no sistema");
             }
-            
-            // Verificar se telefone já existe
-            if (usuarioDAO.existeTelefone(usuario.getTelefone())) {
+            if (usuarioDAO.existeTelefone(conn, usuario.getTelefone())) {
                 throw new RuntimeException("Telefone já está cadastrado no sistema");
             }
-            
+
+            // Preparar dados
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-            
             usuario.setDataCadastro(LocalDate.now());
-            Usuario usuarioSalvo = usuarioDAO.inserirUsuario(usuario);
-            compradorService.inserirComprador(usuarioSalvo.getId());
+
+            // Inserir usuário
+            Usuario usuarioSalvo = usuarioDAO.inserirUsuario(conn, usuario);
+
+            // Inserir comprador e carrinho usando a mesma conexão
+            compradorDAO.inserirComprador(conn, usuarioSalvo.getId());
+            carrinhoDAO.criarCarrinho(conn, usuarioSalvo.getId());
+
+            conn.commit(); // ✅ Finaliza a transação
             return usuarioSalvo;
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // ❌ Desfaz tudo em caso de erro
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
             throw new RuntimeException("Erro ao cadastrar usuário: " + e.getMessage(), e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Restaura o comportamento padrão
+                    conn.close(); // Libera a conexão
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
+
     public boolean existePorCpf(String cpf) {
         try {
-            return usuarioDAO.existeCpf(cpf);
+            Connection conn = dbConnection.getConnection();
+            return usuarioDAO.existeCpf(conn, cpf);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao verificar CPF: " + e.getMessage(), e);
         }
@@ -60,7 +95,8 @@ public class UsuarioService {
 
     public boolean existePorEmail(String email) {
         try {
-            return usuarioDAO.existeEmail(email);
+            Connection conn = dbConnection.getConnection();
+            return usuarioDAO.existeEmail(conn,email);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao verificar email: " + e.getMessage(), e);
         }
@@ -68,7 +104,8 @@ public class UsuarioService {
 
     public boolean existePorTelefone(String telefone) {
         try {
-            return usuarioDAO.existeTelefone(telefone);
+            Connection conn = dbConnection.getConnection();
+            return usuarioDAO.existeTelefone(conn,telefone);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao verificar telefone: " + e.getMessage(), e);
         }
@@ -126,19 +163,22 @@ public class UsuarioService {
             }
 
             if (!usuarioExistente.getCpf().equals(usuarioAtualizado.getCpf())) {
-                if (usuarioDAO.existeCpf(usuarioAtualizado.getCpf())) {
+                Connection conn = dbConnection.getConnection();
+                if (usuarioDAO.existeCpf(conn,usuarioAtualizado.getCpf())) {
                     throw new RuntimeException("CPF já está cadastrado no sistema");
                 }
             }
 
             if (!usuarioExistente.getEmail().equals(usuarioAtualizado.getEmail())) {
-                if (usuarioDAO.existeEmail(usuarioAtualizado.getEmail())) {
+                Connection conn = dbConnection.getConnection();
+                if (usuarioDAO.existeEmail(conn,usuarioAtualizado.getEmail())) {
                     throw new RuntimeException("Email já está cadastrado no sistema");
                 }
             }
 
             if (!usuarioExistente.getTelefone().equals(usuarioAtualizado.getTelefone())) {
-                if (usuarioDAO.existeTelefone(usuarioAtualizado.getTelefone())) {
+                Connection conn = dbConnection.getConnection();
+                if (usuarioDAO.existeTelefone(conn,usuarioAtualizado.getTelefone())) {
                     throw new RuntimeException("Telefone já está cadastrado no sistema");
                 }
             }
