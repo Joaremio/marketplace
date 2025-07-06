@@ -20,13 +20,10 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Seu bean de PasswordEncoder (sem alterações)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    // Sua configuração de CORS (sem alterações)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -44,19 +41,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // AQUI ESTÃO AS REGRAS DE AUTORIZAÇÃO CORRIGIDAS
             .authorizeHttpRequests(auth -> auth
-                // 1. Endpoints Públicos (não precisa de login)
                 .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                 .requestMatchers("/usuarios/verificar-**").permitAll()
                 
-                // 2. Endpoints de Administrador (precisa ter o perfil ROLE_ADMIN)
                 .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/produto").permitAll()
 
-                // 3. Qualquer outra requisição precisa ESTAR AUTENTICADO (qualquer perfil)
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
