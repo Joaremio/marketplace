@@ -48,8 +48,8 @@ public class PedidoDAO {
 
     public void excluirPedido(int pedidoId) throws SQLException {
         String sql = "DELETE FROM pedido WHERE id = ?";
-        try(Connection conn = db_connection.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db_connection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, pedidoId);
             stmt.executeUpdate();
         }
@@ -108,13 +108,12 @@ public class PedidoDAO {
 
     public void atualizarStatusPedido(int pedidoId, String novoStatus) throws SQLException {
         String sql = "UPDATE pedido SET status_pedido = ? WHERE id = ?";
-        try(Connection conn = db_connection.getConnection()){
+        try (Connection conn = db_connection.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, novoStatus);
             stmt.setInt(2, pedidoId);
             stmt.executeUpdate();
         }
     }
-
 }
 

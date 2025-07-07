@@ -42,6 +42,14 @@ public class VendedorService {
         }
     }
 
+    public List<Vendedor> listarVendedoresPorStatus(String status) {
+    try {
+        return vendedorDAO.getVendedoresPorStatus(status);
+    } catch (SQLException e) {
+        throw new RuntimeException("Erro ao listar vendedores por status", e);
+    }
+}
+
     public List<Vendedor> listarVendedores() {
         try{
             return vendedorDAO.getVendedores();

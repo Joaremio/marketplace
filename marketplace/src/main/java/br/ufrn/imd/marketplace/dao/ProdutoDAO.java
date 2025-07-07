@@ -19,6 +19,7 @@ public class ProdutoDAO {
     @Autowired
     private DB_Connection dbConnection;
 
+<<<<<<< HEAD
 
     public ProdutoImagemDTO cadastrarProduto(int vendedorId, ProdutoImagemDTO produto) throws SQLException {
         String sql = "INSERT INTO produto (vendedor_id, nome, preco, descricao, estoque, categoria) " +
@@ -32,6 +33,61 @@ public class ProdutoDAO {
 
             try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+=======
+    public List<ProdutoImagemDTO> buscarProdutosAtivos(String nome, String categoria) throws SQLException {
+        List<ProdutoImagemDTO> produtos = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+            SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl
+            FROM produto p
+            LEFT JOIN imagem i ON p.id = i.produto_id
+            WHERE p.ativo = true AND p.estoque > 0
+        """);
+
+        List<Object> params = new ArrayList<>();
+        if (nome != null && !nome.trim().isEmpty()) {
+            sql.append(" AND p.nome LIKE ?");
+            params.add("%" + nome + "%");
+        }
+        if (categoria != null && !categoria.trim().isEmpty()) {
+            sql.append(" AND p.categoria = ?");
+            params.add(categoria);
+        }
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ProdutoImagemDTO produto = new ProdutoImagemDTO(
+                        rs.getInt("id"), rs.getInt("vendedor_id"), rs.getString("nome"),
+                        rs.getDouble("preco"), rs.getString("descricao"), rs.getInt("estoque"),
+                        rs.getString("categoria"), rs.getString("imageUrl")
+                    );
+                    produtos.add(produto);
+                }
+            }
+        }
+        return produtos;
+    }
+
+
+    public ProdutoImagemDTO cadastrarProduto(int vendedorId, ProdutoImagemDTO produto) throws SQLException {
+        String sql = "INSERT INTO produto (vendedor_id, nome, preco, descricao, estoque, categoria) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        // Use uma transação para garantir a consistência entre as tabelas 'produto' e 'imagem'
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Inicia a transação
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+>>>>>>> main
                 // --- PONTO CRÍTICO DA CORREÇÃO ---
                 // A linha abaixo define o valor para o "parâmetro 1"
                 // É provável que ela esteja faltando no seu código atual.

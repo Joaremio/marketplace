@@ -1,6 +1,5 @@
 package br.ufrn.imd.marketplace.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,12 +19,11 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -40,17 +38,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/usuarios", "/usuarios/**").permitAll()
-                        .requestMatchers("/api/vendedores/**").authenticated()
-                        .anyRequest().permitAll()
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+                .requestMatchers("/usuarios/verificar-**").permitAll()
+                
+                .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/produto").permitAll()
+
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

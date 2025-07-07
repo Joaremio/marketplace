@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/produto")
@@ -53,5 +54,17 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+<<<<<<< HEAD
+=======
+    @GetMapping
+public ResponseEntity<?> buscarProdutosParaVitrine(
+        @RequestParam(required = false) String nome,
+        @RequestParam(required = false) String categoria) {
+    
+    List<ProdutoImagemDTO> produtos = produtoService.buscarProdutosParaVitrine(nome, categoria);
+    return ResponseEntity.ok(produtos);
+}
+
+>>>>>>> main
 
 }
