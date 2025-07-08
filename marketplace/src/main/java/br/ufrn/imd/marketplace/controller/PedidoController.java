@@ -31,6 +31,12 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPedidosPorComprador(compradorId));
     }
 
+    @GetMapping("/vendedorPedidos/{vendedorId}")
+    public ResponseEntity<?> listarPedidosPorVendedor(@PathVariable int vendedorId) {
+        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPedidosPorVendedor(vendedorId));
+    }
+
+
     @GetMapping("/{produtoId}")
     public ResponseEntity<?> buscarProdutoPorId(@PathVariable int produtoId) {
         pedidoService.buscarPedidoPorId(produtoId);
@@ -62,5 +68,7 @@ public class PedidoController {
         pedidoProdutoService.ExcluirItemAoPedido(pedidoId, itemId);
         return ResponseEntity.noContent().build();
     }
+
+
 
 }

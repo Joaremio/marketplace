@@ -53,18 +53,12 @@ public class ProdutoController {
         produtoService.deletarProduto(produtoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-<<<<<<< HEAD
-=======
     @GetMapping
-public ResponseEntity<?> buscarProdutosParaVitrine(
+    public ResponseEntity<?> buscarProdutosParaVitrine(
         @RequestParam(required = false) String nome,
         @RequestParam(required = false) String categoria) {
     
     List<ProdutoImagemDTO> produtos = produtoService.buscarProdutosParaVitrine(nome, categoria);
     return ResponseEntity.ok(produtos);
 }
-
->>>>>>> main
-
 }

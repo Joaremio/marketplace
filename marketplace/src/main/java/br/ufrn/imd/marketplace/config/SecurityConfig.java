@@ -38,22 +38,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                .requestMatchers("/usuarios/verificar-**").permitAll()
-                
-                .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.GET, "/produto").permitAll()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+                        .requestMatchers("/usuarios/verificar-**").permitAll()
 
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/produto").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/pedido/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/pedido").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/carrinho").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/carrinho/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/carrinho").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/carrinho/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/carrinho/produto").authenticated()
+
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

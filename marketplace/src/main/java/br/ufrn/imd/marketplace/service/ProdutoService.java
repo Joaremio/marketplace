@@ -25,8 +25,6 @@ public class ProdutoService {
         }
     }
 
-<<<<<<< HEAD
-=======
     public List<ProdutoImagemDTO> buscarProdutosParaVitrine(String nome, String categoria) {
     try {
         return produtoDAO.buscarProdutosAtivos(nome, categoria);
@@ -34,8 +32,6 @@ public class ProdutoService {
         throw new RuntimeException("Erro ao buscar produtos para vitrine", e);
     }
 }
-
->>>>>>> main
     public List<ProdutoImagemDTO> buscarProdutosPorVendedor(int vendedorId) {
         try{
             List<ProdutoImagemDTO> produtos = produtoDAO.buscarProdutosPorVendedor(vendedorId);

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CarrinhoService {
@@ -82,6 +83,20 @@ public class CarrinhoService {
             return carrinhos;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    public Optional<Carrinho> getCarrinhoByID(int usuarioId) {
+        try {
+            // O DAO já retorna null se não encontrar, o que é perfeito para o Optional.
+            Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
+
+            // Converte o resultado (que pode ser null) em um Optional.
+            return Optional.ofNullable(carrinho);
+        } catch (SQLException e) {
+            // Para erros de SQL reais, ainda lançamos uma exceção de runtime.
+            throw new RuntimeException("Erro de banco de dados ao buscar carrinho", e);
         }
     }
 

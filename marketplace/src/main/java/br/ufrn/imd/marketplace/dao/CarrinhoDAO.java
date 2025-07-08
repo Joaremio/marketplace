@@ -160,6 +160,23 @@ public class CarrinhoDAO {
         return carrinhos;
     }
 
+    public Carrinho getCarrinhoPorId(int usuarioId) throws SQLException {
+        String sql = "SELECT * FROM carrinho WHERE comprador_id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Carrinho carrinho = new Carrinho();
+                carrinho.setId(rs.getInt("id"));
+                carrinho.setCompradorId(rs.getInt("comprador_id"));
+                return carrinho;
+            }
+            return null;
+        }
+    }
+
 
 
 }

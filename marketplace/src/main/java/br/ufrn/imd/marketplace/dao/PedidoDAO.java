@@ -2,6 +2,7 @@ package br.ufrn.imd.marketplace.dao;
 
 
 import br.ufrn.imd.marketplace.config.DB_Connection;
+import br.ufrn.imd.marketplace.dto.PedidoProdutoVendedorDTO;
 import br.ufrn.imd.marketplace.service.Pedido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -115,5 +116,47 @@ public class PedidoDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<PedidoProdutoVendedorDTO> buscarPedidosPendentesPorVendedor(int vendedorId) throws SQLException {
+        List<PedidoProdutoVendedorDTO> lista = new ArrayList<>();
+
+        String sql = "SELECT " +
+                "  p.id AS pedido_id, " +
+                "  p.data_pedido, " +
+                "  p.status_pedido, " +
+                "  pr.id AS produto_id, " +
+                "  pr.nome AS nome_produto, " +
+                "  pp.quantidade, " +
+                "  pp.preco_unitario " +
+                "FROM pedido p " +
+                "JOIN pedido_produto pp ON p.id = pp.pedido_id " +
+                "JOIN produto pr ON pp.produto_id = pr.id " +
+                "WHERE pr.vendedor_id = ? " +
+                "AND p.status_pedido IN ('Pendente', 'Em Andamento')";
+
+        try (Connection conn = db_connection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, vendedorId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                PedidoProdutoVendedorDTO dto = new PedidoProdutoVendedorDTO(
+                        rs.getInt("pedido_id"),
+                        rs.getObject("data_pedido", LocalDate.class),
+                        rs.getString("status_pedido"),
+                        rs.getInt("produto_id"),
+                        rs.getString("nome_produto"),
+                        rs.getInt("quantidade"),
+                        rs.getDouble("preco_unitario")
+                );
+                lista.add(dto);
+            }
+        }
+
+        return lista;
+    }
+
+
 }
 

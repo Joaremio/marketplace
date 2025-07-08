@@ -3,6 +3,7 @@ package br.ufrn.imd.marketplace.service;
 import br.ufrn.imd.marketplace.dao.PedidoDAO;
 import br.ufrn.imd.marketplace.dao.PedidoProdutoDAO;
 import br.ufrn.imd.marketplace.dao.ProdutoDAO;
+import br.ufrn.imd.marketplace.dto.PedidoProdutoVendedorDTO;
 import br.ufrn.imd.marketplace.model.PedidoProduto;
 import br.ufrn.imd.marketplace.model.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,15 @@ public class PedidoService {
             if(pedidos.isEmpty()){
                 throw new RuntimeException("Comprador ainda não possui pedidos");
             }
+            return pedidos;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<PedidoProdutoVendedorDTO> buscarPedidosPorVendedor(int vendedorId){
+        try{
+            List<PedidoProdutoVendedorDTO> pedidos = pedidoDAO.buscarPedidosPendentesPorVendedor(vendedorId);
             return pedidos;
         } catch (SQLException e) {
             throw new RuntimeException(e);
