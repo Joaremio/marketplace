@@ -1,8 +1,7 @@
 package br.ufrn.imd.marketplace.controller;
 
-
+import br.ufrn.imd.marketplace.model.Pedido;
 import br.ufrn.imd.marketplace.model.PedidoProduto;
-import br.ufrn.imd.marketplace.service.Pedido;
 import br.ufrn.imd.marketplace.service.PedidoProdutoService;
 import br.ufrn.imd.marketplace.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +16,15 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
+    // INJEÇÃO MANTIDA CASO USE PARA OUTRAS COISAS, MAS NÃO É USADO NA CRIAÇÃO DO PEDIDO
     @Autowired
     private PedidoProdutoService pedidoProdutoService;
 
 
     @PostMapping()
     public ResponseEntity<?> criarPedido(@RequestBody Pedido pedido) {
+        // CORREÇÃO: A lógica agora está toda encapsulada no serviço, garantindo atomicidade.
+        // O frontend deve enviar o objeto Pedido contendo a lista de itens.
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.criarPedido(pedido));
     }
 
@@ -37,10 +39,12 @@ public class PedidoController {
     }
 
 
-    @GetMapping("/{produtoId}")
-    public ResponseEntity<?> buscarProdutoPorId(@PathVariable int produtoId) {
-        pedidoService.buscarPedidoPorId(produtoId);
-        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPedidoPorId(produtoId));
+    // CORREÇÃO: O nome da variável de path foi corrigido para 'pedidoId'.
+    // CORREÇÃO: A chamada duplicada ao serviço foi removida.
+    @GetMapping("/{pedidoId}")
+    public ResponseEntity<?> buscarPedidoPorId(@PathVariable int pedidoId) {
+        Pedido pedido = pedidoService.buscarPedidoPorId(pedidoId);
+        return ResponseEntity.status(HttpStatus.OK).body(pedido);
     }
 
     @DeleteMapping("/{pedidoId}")
@@ -49,26 +53,24 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{produtoId}/{status}")
-    public ResponseEntity<?> atualizarStatusPedido(@PathVariable int produtoId, @PathVariable String status) {
-        pedidoService.atualizarStatusPedido(produtoId, status);
+    // CORREÇÃO: O nome da variável de path foi corrigido para 'pedidoId'.
+    @PutMapping("/{pedidoId}/{status}")
+    public ResponseEntity<?> atualizarStatusPedido(@PathVariable int pedidoId, @PathVariable String status) {
+        pedidoService.atualizarStatusPedido(pedidoId, status);
         return ResponseEntity.noContent().build();
     }
 
-
+    // Estes endpoints podem ser mantidos para futuras funcionalidades de edição de pedido,
+    // mas não são mais usados no fluxo principal de criação.
     @PostMapping("/item")
     public ResponseEntity<?> adicionarItemAoPedido(@RequestBody PedidoProduto item){
         pedidoProdutoService.AdicionarItemAoPedido(item);
         return ResponseEntity.noContent().build();
     }
 
-
     @DeleteMapping("/{pedidoId}/{itemId}")
     public ResponseEntity<?> removerItemAoPedido(@PathVariable int pedidoId, @PathVariable int itemId) {
         pedidoProdutoService.ExcluirItemAoPedido(pedidoId, itemId);
         return ResponseEntity.noContent().build();
     }
-
-
-
 }

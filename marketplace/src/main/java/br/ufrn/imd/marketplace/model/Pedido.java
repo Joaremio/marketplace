@@ -1,7 +1,4 @@
-package br.ufrn.imd.marketplace.service;
-
-import br.ufrn.imd.marketplace.model.PedidoProduto;
-import br.ufrn.imd.marketplace.model.Produto;
+package br.ufrn.imd.marketplace.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -28,12 +28,10 @@ public class CarrinhoController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    /**
-     * CORREÇÃO: Adicione @PathVariable para vincular os parâmetros da URL aos argumentos do método.
-     */
     @DeleteMapping("/produto/{produtoId}/{usuarioId}")
     public ResponseEntity<?> removerProduto(@PathVariable int produtoId, @PathVariable int usuarioId) {
-        carrinhoService.removerProduto(produtoId, usuarioId);
+        // CORREÇÃO: A ordem dos argumentos foi ajustada para bater com o que o serviço espera.
+        carrinhoService.removerProduto(usuarioId, produtoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -48,13 +46,23 @@ public class CarrinhoController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<?> getCarrinhoById(@PathVariable int usuarioId) {
-        // Chama o serviço modificado
-        Optional<Carrinho> carrinhoOptional = carrinhoService.getCarrinhoByID(usuarioId);
+    public ResponseEntity<?> getCarrinhoPorUsuario(@PathVariable int usuarioId) {
+        // Chama o serviço que retorna o objeto completo
+        Carrinho carrinhoCompleto = carrinhoService.buscarCarrinhoCompletoPorUsuarioId(usuarioId);
 
-        // Usa um método funcional do Optional para retornar a resposta apropriada
-        return carrinhoOptional
-                .map(carrinho -> ResponseEntity.ok(carrinho)) // Se presente, mapeia para 200 OK com o corpo
-                .orElseGet(() -> ResponseEntity.notFound().build()); // Se ausente, retorna 404 Not Found
+        if (carrinhoCompleto != null) {
+            return ResponseEntity.ok(carrinhoCompleto); // Retorna 200 OK com o carrinho e seus produtos
+        } else {
+            return ResponseEntity.notFound().build(); // Retorna 404 se o usuário não tiver um carrinho
+        }
+    }
+
+    // Em CarrinhoController.java
+
+    @PutMapping("/produto/quantidade")
+    public ResponseEntity<?> atualizarQuantidade(@RequestBody CarrinhoProduto produto) {
+        // Vamos precisar de um método no serviço para isso
+        carrinhoService.atualizarQuantidade(produto);
+        return ResponseEntity.ok().build();
     }
 }

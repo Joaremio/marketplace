@@ -8,12 +8,15 @@ public class PedidoProduto {
     private double precoUnidade;
     private String avaliacao;
 
+    private String nome;
+
     public PedidoProduto() {}
-    public PedidoProduto(int pedidoId, int produtoId, int quantidade, double precoUnidade) {
+    public PedidoProduto(int pedidoId, int produtoId, int quantidade, double precoUnidade, String nome) {
         this.pedidoId = pedidoId;
         this.produtoId = produtoId;
         this.quantidade = quantidade;
         this.precoUnidade = precoUnidade;
+        this.nome = nome;
     }
 
     public int getPedidoId() {
@@ -55,4 +58,13 @@ public class PedidoProduto {
     public void setAvaliacao(String avaliacao) {
         this.avaliacao = avaliacao;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 }
+
