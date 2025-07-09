@@ -264,4 +264,42 @@ public class ProdutoDAO {
             conn.close();
         }
     }
+
+    /**
+     * NOVO MÉTODO ADICIONADO: Busca um único produto pelo seu ID, independente do vendedor.
+     * Essencial para o PedidoService validar o preço dos itens no carrinho.
+     * @param produtoId O ID do produto a ser buscado.
+     * @return um ProdutoImagemDTO se encontrado, ou null caso contrário.
+     * @throws SQLException
+     */
+    public ProdutoImagemDTO buscarProdutoPorId(int produtoId) throws SQLException {
+        String sql = """
+            SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl
+            FROM produto p
+            LEFT JOIN imagem i ON p.id = i.produto_id
+            WHERE p.id = ? AND p.ativo = true
+        """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, produtoId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new ProdutoImagemDTO(
+                            rs.getInt("id"),
+                            rs.getInt("vendedor_id"),
+                            rs.getString("nome"),
+                            rs.getDouble("preco"),
+                            rs.getString("descricao"),
+                            rs.getInt("estoque"),
+                            rs.getString("categoria"),
+                            rs.getString("imageUrl")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }

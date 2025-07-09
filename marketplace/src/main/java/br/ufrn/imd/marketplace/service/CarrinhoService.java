@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,17 +36,11 @@ public class CarrinhoService {
     public void inserirProduto(CarrinhoProduto produto) {
         try {
             if (carrinhoDAO.produtoExisteNoCarrinho(produto.getProdutoId(), produto.getCarrinhoId())) {
-                // Busca a quantidade atual no carrinho
                 int quantidadeAtual = carrinhoDAO.obterQuantidadeDoProduto(produto.getCarrinhoId(), produto.getProdutoId());
-
-                // Soma a nova quantidade
                 int novaQuantidade = quantidadeAtual + produto.getQuantidade();
                 produto.setQuantidade(novaQuantidade);
-
-                // Atualiza a quantidade no banco
                 carrinhoDAO.atualizarQuantidade(produto);
             } else {
-                // Insere novo produto no carrinho
                 carrinhoDAO.inserirProduto(produto);
             }
         } catch (SQLException e) {
@@ -55,13 +48,24 @@ public class CarrinhoService {
         }
     }
 
-    public void removerProduto(int carrinhoId, int produtoId) {
-        try{
-            carrinhoDAO.removerProdutoDoCarrinho(carrinhoId, produtoId);
-        }catch (SQLException e) {
-            throw new RuntimeException("Erro ao remover produto no carrinho", e);
+    public Carrinho buscarCarrinhoCompletoPorUsuarioId(int usuarioId) {
+        try {
+            // 1. Busca o "casco" do carrinho
+            Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
+
+            // 2. Se o carrinho existir, busca seus produtos detalhados
+            if (carrinho != null) {
+                List<ProdutoCarrinhoDetalhado> produtos = carrinhoDAO.obterProdutosDetalhadosDoCarrinho(carrinho.getId());
+                // 3. Anexa a lista de produtos ao objeto carrinho
+                carrinho.setProdutos(produtos);
+            }
+
+            return carrinho;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro de banco de dados ao buscar carrinho completo.", e);
         }
     }
+
 
     public List<ProdutoCarrinhoDetalhado> getProdutos(int carrinhoId){
         try{
@@ -101,32 +105,32 @@ public class CarrinhoService {
         }
     }
 
+    public void removerProduto(int usuarioId, int produtoId) {
+        try {
+            // 1. Encontra o carrinho do usuário para obter o carrinhoId
+            Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
+
+            if (carrinho != null) {
+                // 2. Com o carrinhoId em mãos, chama o DAO para remover o item específico
+                carrinhoDAO.removerProdutoDoCarrinho(carrinho.getId(), produtoId);
+            } else {
+                throw new RuntimeException("Carrinho não encontrado para o usuário com ID: " + usuarioId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao remover produto do carrinho", e);
+        }
+    }
+
     // Em CarrinhoService.java
 
-public void atualizarQuantidadeProduto(int carrinhoId, int produtoId, int novaQuantidade) {
-    try {
-        if (novaQuantidade <= 0) {
-            removerProduto(carrinhoId, produtoId);
-        } else {
-            carrinhoDAO.atualizarQuantidade(carrinhoId, produtoId, novaQuantidade);
+    public void atualizarQuantidade(CarrinhoProduto produto) {
+        try {
+            // O seu DAO já deve ter um método para isso, basta chamá-lo.
+            carrinhoDAO.atualizarQuantidade(produto);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar quantidade do produto", e);
         }
-    } catch (SQLException e) {
-        throw new RuntimeException("Erro ao atualizar quantidade no carrinho", e);
     }
-}
-
-public List<ProdutoCarrinhoDetalhado> getProdutosDetalhadosPorUsuario(int usuarioId) {
-    try {
-        Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
-        if (carrinho == null) {
-            // Se o usuário não tem carrinho, retorna uma lista vazia, não um erro.
-            return new ArrayList<>();
-        }
-        return carrinhoDAO.obterProdutosDetalhadosDoCarrinho(carrinho.getId());
-    } catch (SQLException e) {
-        throw new RuntimeException("Erro ao buscar produtos do carrinho", e);
-    }
-}
 
 
 }
