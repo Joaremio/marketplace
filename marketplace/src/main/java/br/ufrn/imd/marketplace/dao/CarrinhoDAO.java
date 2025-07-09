@@ -177,6 +177,17 @@ public class CarrinhoDAO {
         }
     }
 
+    public void atualizarQuantidade(int carrinhoId, int produtoId, int quantidade) throws SQLException {
+    String sql = "UPDATE carrinho_produto SET quantidade = ? WHERE carrinho_id = ? AND produto_id = ?";
+    try (Connection conn = dbConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, quantidade);
+        stmt.setInt(2, carrinhoId);
+        stmt.setInt(3, produtoId);
+        stmt.executeUpdate();
+    }
+}
+
 
 
 }

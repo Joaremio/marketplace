@@ -177,6 +177,29 @@ public class ProdutoDAO {
         return null;
     }
 
+    public ProdutoImagemDTO buscarProdutoPublicoPorId(int produtoId) throws SQLException {
+        String sql = """
+            SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl
+            FROM produto p
+            LEFT JOIN imagem i ON p.id = i.produto_id
+            WHERE p.id = ? AND p.ativo = true AND p.estoque > 0
+        """;
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, produtoId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new ProdutoImagemDTO(
+                        rs.getInt("id"), rs.getInt("vendedor_id"), rs.getString("nome"),
+                        rs.getDouble("preco"), rs.getString("descricao"), rs.getInt("estoque"),
+                        rs.getString("categoria"), rs.getString("imageUrl")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     // ✅ Método 5: Desativar produto
     public boolean desativarProduto(int vendedorId, int produtoId) throws SQLException {
         String sql = "UPDATE produto SET ativo = false WHERE vendedor_id = ? AND id = ?";

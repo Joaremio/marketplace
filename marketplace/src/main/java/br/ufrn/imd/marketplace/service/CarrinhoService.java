@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +100,33 @@ public class CarrinhoService {
             throw new RuntimeException("Erro de banco de dados ao buscar carrinho", e);
         }
     }
+
+    // Em CarrinhoService.java
+
+public void atualizarQuantidadeProduto(int carrinhoId, int produtoId, int novaQuantidade) {
+    try {
+        if (novaQuantidade <= 0) {
+            removerProduto(carrinhoId, produtoId);
+        } else {
+            carrinhoDAO.atualizarQuantidade(carrinhoId, produtoId, novaQuantidade);
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException("Erro ao atualizar quantidade no carrinho", e);
+    }
+}
+
+public List<ProdutoCarrinhoDetalhado> getProdutosDetalhadosPorUsuario(int usuarioId) {
+    try {
+        Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
+        if (carrinho == null) {
+            // Se o usuário não tem carrinho, retorna uma lista vazia, não um erro.
+            return new ArrayList<>();
+        }
+        return carrinhoDAO.obterProdutosDetalhadosDoCarrinho(carrinho.getId());
+    } catch (SQLException e) {
+        throw new RuntimeException("Erro ao buscar produtos do carrinho", e);
+    }
+}
 
 
 }

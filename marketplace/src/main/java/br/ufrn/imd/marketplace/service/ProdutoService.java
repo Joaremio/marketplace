@@ -32,6 +32,18 @@ public class ProdutoService {
         throw new RuntimeException("Erro ao buscar produtos para vitrine", e);
     }
 }
+
+public ProdutoImagemDTO buscarProdutoPublicoPorId(int produtoId) {
+        try {
+            ProdutoImagemDTO produto = produtoDAO.buscarProdutoPublicoPorId(produtoId);
+            if (produto == null) {
+                throw new RuntimeException("Produto não encontrado ou indisponível.");
+            }
+            return produto;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar produto.", e);
+        }
+    }
     public List<ProdutoImagemDTO> buscarProdutosPorVendedor(int vendedorId) {
         try{
             List<ProdutoImagemDTO> produtos = produtoDAO.buscarProdutosPorVendedor(vendedorId);
