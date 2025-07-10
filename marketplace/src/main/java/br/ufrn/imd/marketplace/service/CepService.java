@@ -16,15 +16,11 @@ public class CepService {
     @Autowired
     private UsuarioDAO usuarioDAO;
 
-    public void inserirCep(Cep cep) {
+    public void salvarOuAtualizar(Cep cep) {
         try {
-            if (cepDAO.cepExiste(cep.getCep())) {
-                System.out.println("CEP já existe, reutilizando.");
-                return;
-            }
-            cepDAO.inserirCep(cep);
+            cepDAO.salvarOuAtualizar(cep);
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir CEP", e);
+            throw new RuntimeException("Erro ao salvar ou atualizar CEP", e);
         }
     }
 
@@ -53,12 +49,6 @@ public class CepService {
     }
 
 
-    public Cep alterarCep(String cepAntigo, Cep cepAtualizado) {
-        try {
-            return cepDAO.atualizarCep(cepAntigo, cepAtualizado);
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar CEP: " + cepAntigo, e);
-        }
-    }
+
 
 }

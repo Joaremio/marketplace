@@ -23,18 +23,39 @@ public class EnderecoController {
     @Autowired
     private CepService cepService;
 
-    //cria endereco completo
+    // O CepService não é mais necessário aqui
+
+    /**
+     * Endpoint para criar um novo endereço completo (Endereço + CEP).
+     * A lógica foi movida para o EnderecoService.
+     */
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> inserirEndereco(@PathVariable int usuarioId, @RequestBody EnderecoCepDTO dto) {
-        Cep cep = dto.getCep();
-        Endereco endereco = dto.getEndereco();
+        try {
+            EnderecoCepDTO enderecoCriado = enderecoService.inserirEnderecoCompleto(usuarioId, dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(enderecoCriado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
-        cepService.inserirCep(cep);
-        enderecoService.inserirEndereco(usuarioId, endereco);
-
-        dto.setEndereco(endereco);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    /**
+     * Endpoint para atualizar um endereço existente.
+     * Retorna o objeto DTO atualizado.
+     */
+    @PutMapping("/{usuarioId}/endereco/{enderecoId}")
+    public ResponseEntity<?> atualizarEndereco(
+            @PathVariable int usuarioId,
+            @PathVariable int enderecoId,
+            @RequestBody EnderecoCepDTO dto) {
+        try {
+            enderecoService.atualizarEnderecoComCep(usuarioId, enderecoId, dto);
+            
+            // CORREÇÃO: Retorna o objeto DTO para o frontend
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
@@ -81,16 +102,5 @@ public class EnderecoController {
         enderecoService.deletarEnderecoComCep(enderecoId);
         return ResponseEntity.ok("Endereço deletado com sucesso.");
     }
-
-    @PutMapping("/{usuarioId}/endereco/{enderecoId}")
-    public ResponseEntity<?> atualizarEndereco(
-            @PathVariable int usuarioId,
-            @PathVariable int enderecoId,
-            @RequestBody EnderecoCepDTO dto) {
-
-        enderecoService.atualizarEnderecoComCep(usuarioId, enderecoId, dto);
-        return ResponseEntity.ok("Endereço atualizado com sucesso.");
-    }
-
 
 }
