@@ -19,50 +19,74 @@ public class CarrinhoController {
 
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> criarCarrinho(@PathVariable int usuarioId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(carrinhoService.criarCarrinho(usuarioId));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(carrinhoService.criarCarrinho(usuarioId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping("/produto")
     public ResponseEntity<?> inserirProduto(@RequestBody CarrinhoProduto produto) {
-        carrinhoService.inserirProduto(produto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        try {
+            carrinhoService.inserirProduto(produto);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/produto/{produtoId}/{usuarioId}")
     public ResponseEntity<?> removerProduto(@PathVariable int produtoId, @PathVariable int usuarioId) {
-        // CORREÇÃO: A ordem dos argumentos foi ajustada para bater com o que o serviço espera.
-        carrinhoService.removerProduto(usuarioId, produtoId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            carrinhoService.removerProduto(usuarioId, produtoId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/{carrinhoId}")
     public ResponseEntity<?> getProdutosCarrinho(@PathVariable int carrinhoId) {
-        return ResponseEntity.status(HttpStatus.OK).body(carrinhoService.getProdutos(carrinhoId));
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(carrinhoService.getProdutos(carrinhoId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/todos")
     public ResponseEntity<?> getAllCarrinhos() {
-        return ResponseEntity.status(HttpStatus.OK).body(carrinhoService.listarCarrinhos());
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(carrinhoService.listarCarrinhos());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<?> getCarrinhoPorUsuario(@PathVariable int usuarioId) {
-        // Chama o serviço que retorna o objeto completo
-        Carrinho carrinhoCompleto = carrinhoService.buscarCarrinhoCompletoPorUsuarioId(usuarioId);
+        try {
+            // Chama o serviço que retorna o objeto completo
+            Carrinho carrinhoCompleto = carrinhoService.buscarCarrinhoCompletoPorUsuarioId(usuarioId);
 
-        if (carrinhoCompleto != null) {
-            return ResponseEntity.ok(carrinhoCompleto); // Retorna 200 OK com o carrinho e seus produtos
-        } else {
-            return ResponseEntity.notFound().build(); // Retorna 404 se o usuário não tiver um carrinho
+            if (carrinhoCompleto != null) {
+                return ResponseEntity.ok(carrinhoCompleto); // Retorna 200 OK com o carrinho e seus produtos
+            } else {
+                return ResponseEntity.notFound().build(); // Retorna 404 se o usuário não tiver um carrinho
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // Em CarrinhoController.java
-
     @PutMapping("/produto/quantidade")
     public ResponseEntity<?> atualizarQuantidade(@RequestBody CarrinhoProduto produto) {
-        // Vamos precisar de um método no serviço para isso
-        carrinhoService.atualizarQuantidade(produto);
-        return ResponseEntity.ok().build();
+        try {
+            carrinhoService.atualizarQuantidade(produto);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

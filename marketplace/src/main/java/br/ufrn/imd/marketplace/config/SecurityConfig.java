@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/produto").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/produto/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/pedido/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/pedido").permitAll()
                         .requestMatchers(HttpMethod.GET, "/carrinho").permitAll()

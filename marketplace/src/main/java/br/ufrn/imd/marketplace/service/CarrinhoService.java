@@ -1,9 +1,10 @@
 package br.ufrn.imd.marketplace.service;
 
-
 import br.ufrn.imd.marketplace.config.DB_Connection;
 import br.ufrn.imd.marketplace.dao.CarrinhoDAO;
+import br.ufrn.imd.marketplace.dao.ProdutoDAO;
 import br.ufrn.imd.marketplace.dto.ProdutoCarrinhoDetalhado;
+import br.ufrn.imd.marketplace.dto.ProdutoImagemDTO;
 import br.ufrn.imd.marketplace.model.Carrinho;
 import br.ufrn.imd.marketplace.model.CarrinhoProduto;
 import br.ufrn.imd.marketplace.model.Produto;
@@ -22,12 +23,15 @@ public class CarrinhoService {
     private CarrinhoDAO carrinhoDAO;
 
     @Autowired
+    private ProdutoDAO produtoDAO;
+
+    @Autowired
     private DB_Connection dbConnection;
 
     public Carrinho criarCarrinho(int compradorId) {
         try {
             Connection conn = dbConnection.getConnection();
-            return carrinhoDAO.criarCarrinho(conn,compradorId);
+            return carrinhoDAO.criarCarrinho(conn, compradorId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -35,12 +39,32 @@ public class CarrinhoService {
 
     public void inserirProduto(CarrinhoProduto produto) {
         try {
+            // Busca o produto para verificar o estoque
+            ProdutoImagemDTO produtoInfo = produtoDAO.buscarProdutoPorId(produto.getProdutoId());
+            
+            if (produtoInfo == null) {
+                throw new RuntimeException("Produto não encontrado");
+            }
+
             if (carrinhoDAO.produtoExisteNoCarrinho(produto.getProdutoId(), produto.getCarrinhoId())) {
                 int quantidadeAtual = carrinhoDAO.obterQuantidadeDoProduto(produto.getCarrinhoId(), produto.getProdutoId());
                 int novaQuantidade = quantidadeAtual + produto.getQuantidade();
+                
+                // Verifica se a nova quantidade não excede o estoque
+                if (novaQuantidade > produtoInfo.getEstoque()) {
+                    throw new RuntimeException("Quantidade solicitada (" + novaQuantidade + 
+                        ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
+                }
+                
                 produto.setQuantidade(novaQuantidade);
                 carrinhoDAO.atualizarQuantidade(produto);
             } else {
+                // Verifica se a quantidade inicial não excede o estoque
+                if (produto.getQuantidade() > produtoInfo.getEstoque()) {
+                    throw new RuntimeException("Quantidade solicitada (" + produto.getQuantidade() + 
+                        ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
+                }
+                
                 carrinhoDAO.inserirProduto(produto);
             }
         } catch (SQLException e) {
@@ -66,11 +90,10 @@ public class CarrinhoService {
         }
     }
 
-
-    public List<ProdutoCarrinhoDetalhado> getProdutos(int carrinhoId){
-        try{
+    public List<ProdutoCarrinhoDetalhado> getProdutos(int carrinhoId) {
+        try {
             List<ProdutoCarrinhoDetalhado> produtos = carrinhoDAO.obterProdutosDetalhadosDoCarrinho(carrinhoId);
-            if(produtos.isEmpty()){
+            if (produtos.isEmpty()) {
                 throw new RuntimeException("Carrinho está vazio");
             }
             return produtos;
@@ -80,9 +103,9 @@ public class CarrinhoService {
     }
 
     public List<Carrinho> listarCarrinhos() {
-        try{
+        try {
             List<Carrinho> carrinhos = carrinhoDAO.listarTodos();
-            if(carrinhos.isEmpty()){
+            if (carrinhos.isEmpty()) {
                 throw new RuntimeException("Não possui carrinhos");
             }
             return carrinhos;
@@ -90,7 +113,6 @@ public class CarrinhoService {
             throw new RuntimeException(e);
         }
     }
-
 
     public Optional<Carrinho> getCarrinhoByID(int usuarioId) {
         try {
@@ -121,17 +143,29 @@ public class CarrinhoService {
         }
     }
 
-    // Em CarrinhoService.java
-
     public void atualizarQuantidade(CarrinhoProduto produto) {
         try {
-            // O seu DAO já deve ter um método para isso, basta chamá-lo.
+            // Busca o produto para verificar o estoque
+            ProdutoImagemDTO produtoInfo = produtoDAO.buscarProdutoPorId(produto.getProdutoId());
+            
+            if (produtoInfo == null) {
+                throw new RuntimeException("Produto não encontrado");
+            }
+
+            // Verifica se a quantidade solicitada não excede o estoque
+            if (produto.getQuantidade() > produtoInfo.getEstoque()) {
+                throw new RuntimeException("Quantidade solicitada (" + produto.getQuantidade() + 
+                    ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
+            }
+
+            // Verifica se a quantidade é válida (maior que 0)
+            if (produto.getQuantidade() <= 0) {
+                throw new RuntimeException("Quantidade deve ser maior que zero");
+            }
+
             carrinhoDAO.atualizarQuantidade(produto);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar quantidade do produto", e);
         }
     }
-
-
 }
-
