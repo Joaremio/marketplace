@@ -1,6 +1,7 @@
 package br.ufrn.imd.marketplace.dao;
 
 import br.ufrn.imd.marketplace.config.DB_Connection;
+import br.ufrn.imd.marketplace.dto.ItemPedidoDTO;
 import br.ufrn.imd.marketplace.model.PedidoProduto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -52,28 +53,33 @@ public class PedidoProdutoDAO {
      */
     public List<PedidoProduto> ListarItensDoPedido(int pedidoId) throws SQLException {
         List<PedidoProduto> itens = new ArrayList<>();
-        // MUDANÇA: Adicionado JOIN com a tabela 'produto' para buscar o nome
-        String sql = "SELECT pp.*, p.nome " +
+
+        // 🚨 Atualize sua query para também trazer o nome do vendedor
+        String sql = "SELECT pp.*, p.nome AS nome_produto, u.nome AS nome_vendedor " +
                 "FROM pedido_produto pp " +
                 "JOIN produto p ON pp.PRODUTO_id = p.id " +
+                "JOIN usuario u ON p.vendedor_id = u.id " +
                 "WHERE pp.PEDIDO_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, pedidoId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
                 PedidoProduto item = new PedidoProduto();
                 item.setPedidoId(rs.getInt("PEDIDO_id"));
                 item.setProdutoId(rs.getInt("PRODUTO_id"));
                 item.setQuantidade(rs.getInt("quantidade"));
                 item.setPrecoUnidade(rs.getDouble("preco_unitario"));
-                item.setNome(rs.getString("nome")); // Preenchendo o nome do produto
+                item.setNome(rs.getString("nome_produto")); // Nome do produto
+                item.setVendedorNome(rs.getString("nome_vendedor")); // 💡 Nome do vendedor
                 itens.add(item);
             }
         }
         return itens;
     }
+
 
     /**
      * Essencial para corrigir o problema de performance N+1.

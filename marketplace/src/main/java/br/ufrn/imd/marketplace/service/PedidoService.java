@@ -4,6 +4,8 @@ import br.ufrn.imd.marketplace.config.DB_Connection;
 import br.ufrn.imd.marketplace.dao.PedidoDAO;
 import br.ufrn.imd.marketplace.dao.PedidoProdutoDAO;
 import br.ufrn.imd.marketplace.dao.ProdutoDAO;
+import br.ufrn.imd.marketplace.dto.ItemPedidoDTO;
+import br.ufrn.imd.marketplace.dto.PedidoComItensDTO;
 import br.ufrn.imd.marketplace.dto.PedidoProdutoVendedorDTO;
 import br.ufrn.imd.marketplace.dto.ProdutoImagemDTO;
 import br.ufrn.imd.marketplace.model.Pedido;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -151,6 +154,45 @@ public class PedidoService {
     public List<PedidoProdutoVendedorDTO> buscarPedidosPorVendedor(int vendedorId) {
         try {
             return pedidoDAO.buscarPedidosPendentesPorVendedor(vendedorId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<PedidoComItensDTO> buscarPedidosDTOPorComprador(int compradorId) {
+        try {
+            List<Pedido> pedidos = pedidoDAO.buscarPedidosPorComprador(compradorId);
+            if (pedidos.isEmpty()) return Collections.emptyList();
+
+            List<PedidoComItensDTO> pedidosDTO = new ArrayList<>();
+
+            for (Pedido pedido : pedidos) {
+                List<PedidoProduto> itens = pedidoProdutoDAO.ListarItensDoPedido(pedido.getId());
+
+                List<ItemPedidoDTO> itensDTO = new ArrayList<>();
+                for (PedidoProduto item : itens) {
+                    ItemPedidoDTO itemDTO = new ItemPedidoDTO(
+                            item.getProdutoId(),
+                            item.getNome(),
+                            null, // ImageUrl opcional, adicionar se tiver
+                            item.getQuantidade(),
+                            item.getPrecoUnidade(),
+                            item.getVendedorNome() // Este campo será preenchido no DAO
+                    );
+                    itemDTO.setPedidoId(pedido.getId());
+                    itensDTO.add(itemDTO);
+                }
+
+                PedidoComItensDTO dto = new PedidoComItensDTO();
+                dto.setId(pedido.getId());
+                dto.setDataPedido(pedido.getDataPedido().toString());
+                dto.setValorTotal(pedido.getValorTotal());
+                dto.setItens(itensDTO);
+
+                pedidosDTO.add(dto);
+            }
+
+            return pedidosDTO;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

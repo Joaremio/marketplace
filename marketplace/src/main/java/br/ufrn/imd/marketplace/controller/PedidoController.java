@@ -30,8 +30,9 @@ public class PedidoController {
 
     @GetMapping("/comprador/{compradorId}")
     public ResponseEntity<?> listarPedidosPorComprador(@PathVariable int compradorId) {
-        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPedidosPorComprador(compradorId));
+        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPedidosDTOPorComprador(compradorId));
     }
+
 
     @GetMapping("/vendedorPedidos/{vendedorId}")
     public ResponseEntity<?> listarPedidosPorVendedor(@PathVariable int vendedorId) {
