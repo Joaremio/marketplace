@@ -44,7 +44,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        .requestMatchers("/usuarios/verificar-**").permitAll()
+                        // CORREÇÃO 1: Trocado hífen por barra
+                        .requestMatchers("/usuarios/verificar/**").permitAll()
 
                         .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
@@ -57,6 +58,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/carrinho").permitAll()
                         .requestMatchers(HttpMethod.POST, "/carrinho/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/carrinho/produto").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/listaDesejos").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/listaDesejos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/listaDesejos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/listaDesejos/por-comprador/{compradorId}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/listaDesejos/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/listaDesejos/**").permitAll()
+
+
 
                         .anyRequest().authenticated()
                 )
