@@ -95,10 +95,23 @@ public class PedidoProdutoDAO {
         List<PedidoProduto> itens = new ArrayList<>();
         String placeholders = String.join(",", Collections.nCopies(pedidoIds.size(), "?"));
 
-        String sql = "SELECT pp.*, p.nome " +
-                "FROM pedido_produto pp " +
-                "JOIN produto p ON pp.PRODUTO_id = p.id " +
-                "WHERE pp.PEDIDO_id IN (" + placeholders + ")";
+        String sql = "SELECT " +
+                "    pp.quantidade, " +
+                "    pp.preco_unitario, " +
+                "    pp.produto_id, " +
+                "    pp.pedido_id, " +
+                "    p.nome AS produto_nome, " +
+                "    u.nome AS vendedor_nome, " +
+                "    i.imagem AS imagem_url " + // Pegando imagem com LEFT JOIN
+                "FROM " +
+                "    pedido_produto pp " +
+                "JOIN produto p ON pp.produto_id = p.id " +
+                "JOIN vendedor v ON p.vendedor_id = v.usuario_id " +
+                "JOIN usuario u ON v.usuario_id = u.id " +
+                "LEFT JOIN imagem i ON i.PRODUTO_ID = p.id " +
+                "WHERE pp.pedido_id IN (" + placeholders + ")";
+
+
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -110,11 +123,15 @@ public class PedidoProdutoDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 PedidoProduto item = new PedidoProduto();
-                item.setPedidoId(rs.getInt("PEDIDO_id"));
-                item.setProdutoId(rs.getInt("PRODUTO_id"));
+                item.setPedidoId(rs.getInt("pedido_id"));
+                item.setProdutoId(rs.getInt("produto_id"));
                 item.setQuantidade(rs.getInt("quantidade"));
                 item.setPrecoUnidade(rs.getDouble("preco_unitario"));
-                item.setNome(rs.getString("nome")); // Preenchendo o nome do produto
+                item.setNome(rs.getString("produto_nome")); // não "nome"
+                item.setVendedorNome(rs.getString("vendedor_nome")); // se existir esse campo// Preenchendo o nome do produto
+                String url = rs.getString("imagem_url");
+                item.setImageUrl(url != null ? url : "https://via.placeholder.com/150");
+                System.out.println("DEBUG IMAGEM: " + item.getImageUrl());
                 itens.add(item);
             }
         }

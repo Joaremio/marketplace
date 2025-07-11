@@ -6,6 +6,7 @@ public class PedidoComItensDTO {
     private int id;
     private String dataPedido;
     private double valorTotal;
+    private String status;
     private List<ItemPedidoDTO> itens;
 
     // Getters e Setters
@@ -39,5 +40,13 @@ public class PedidoComItensDTO {
 
     public void setItens(List<ItemPedidoDTO> itens) {
         this.itens = itens;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

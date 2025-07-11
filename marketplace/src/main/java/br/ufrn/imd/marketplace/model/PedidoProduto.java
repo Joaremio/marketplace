@@ -8,14 +8,16 @@ public class PedidoProduto {
     private String vendedorNome;   // nome do vendedor
     private int quantidade;
     private double precoUnidade;
+    private String imageUrl;
 
-    public PedidoProduto(Integer pedidoId, Integer produtoId, String nome, String vendedorNome, int quantidade, double precoUnidade) {
+    public PedidoProduto(Integer pedidoId, Integer produtoId, String nome, String vendedorNome, int quantidade, double precoUnidade, String imageUrl) {
         this.pedidoId = pedidoId;
         this.produtoId = produtoId;
         this.nome = nome;
         this.vendedorNome = vendedorNome;
         this.quantidade = quantidade;
         this.precoUnidade = precoUnidade;
+        this.imageUrl = imageUrl;
     }
 
     public PedidoProduto(){}
@@ -68,5 +70,13 @@ public class PedidoProduto {
 
     public void setPrecoUnidade(double precoUnidade) {
         this.precoUnidade = precoUnidade;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

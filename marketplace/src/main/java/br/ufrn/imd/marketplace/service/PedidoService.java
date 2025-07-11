@@ -167,14 +167,14 @@ public class PedidoService {
             List<PedidoComItensDTO> pedidosDTO = new ArrayList<>();
 
             for (Pedido pedido : pedidos) {
-                List<PedidoProduto> itens = pedidoProdutoDAO.ListarItensDoPedido(pedido.getId());
+                List<PedidoProduto> itens = pedidoProdutoDAO.listarItensParaMultiplosPedidos(List.of(pedido.getId()));
 
                 List<ItemPedidoDTO> itensDTO = new ArrayList<>();
                 for (PedidoProduto item : itens) {
                     ItemPedidoDTO itemDTO = new ItemPedidoDTO(
                             item.getProdutoId(),
                             item.getNome(),
-                            null, // ImageUrl opcional, adicionar se tiver
+                            item.getImageUrl(), // ImageUrl opcional, adicionar se tiver
                             item.getQuantidade(),
                             item.getPrecoUnidade(),
                             item.getVendedorNome() // Este campo será preenchido no DAO
@@ -187,7 +187,9 @@ public class PedidoService {
                 dto.setId(pedido.getId());
                 dto.setDataPedido(pedido.getDataPedido().toString());
                 dto.setValorTotal(pedido.getValorTotal());
+                dto.setStatus(pedido.getStatusPedido());
                 dto.setItens(itensDTO);
+
 
                 pedidosDTO.add(dto);
             }

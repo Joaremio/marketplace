@@ -171,7 +171,7 @@ public class PedidoDAO {
                 "JOIN pedido_produto pp ON p.id = pp.pedido_id " +
                 "JOIN produto pr ON pp.produto_id = pr.id " +
                 "WHERE pr.vendedor_id = ? " +
-                "AND p.status_pedido IN ('Pendente', 'Em Andamento')";
+                "AND p.status_pedido IN ('ANALISE', 'Aguardando Pagamento')";
 
         try (Connection conn = db_connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
