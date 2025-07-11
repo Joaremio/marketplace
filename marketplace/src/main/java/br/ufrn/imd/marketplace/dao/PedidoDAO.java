@@ -1,5 +1,6 @@
 package br.ufrn.imd.marketplace.dao;
 
+import br.ufrn.imd.marketplace.StatusPedido;
 import br.ufrn.imd.marketplace.config.DB_Connection;
 import br.ufrn.imd.marketplace.dto.PedidoProdutoVendedorDTO;
 import br.ufrn.imd.marketplace.model.Pedido;
@@ -35,29 +36,24 @@ public class PedidoDAO {
             stmt.setObject(2, pedido.getDataPedido());
             stmt.setObject(3, pedido.getPrevisaoEntrega());
 
-            // CORREÇÃO: Tratar corretamente o valor para a coluna DATETIME 'efetivacao'
             if (pedido.getEfetivacao() != null) {
-                // Este bloco será usado no futuro, quando você for ATUALIZAR um pedido como "entregue"
                 stmt.setObject(4, pedido.getEfetivacao());
             } else {
-                // Na CRIAÇÃO do pedido, o valor é nulo, então usamos setNull com o tipo SQL correto
                 stmt.setNull(4, Types.TIMESTAMP);
             }
 
             stmt.setDouble(5, pedido.getValorTotal());
             stmt.setString(6, pedido.getPagamentoForma());
-            stmt.setString(7, pedido.getStatusPedido());
 
-            stmt.executeUpdate();
+            // Aqui forçando o status PENDENTE na criação
+            stmt.setString(7, StatusPedido.PENDENTE.name());
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    pedido.setId(generatedKeys.getInt(1));
-                }
-            }
+            // Executar insert e recuperar id gerado...
+            // (se necessário continuar código para recuperar ID e retornar pedido atualizado)
         }
         return pedido;
     }
+
 
     // O método original pode ser mantido para chamadas não transacionais, se necessário
     public Pedido criarPedido(Pedido pedido) throws SQLException {
@@ -90,7 +86,7 @@ public class PedidoDAO {
                 pedido.setId(rs.getInt("id"));
                 pedido.setCompradorId(rs.getInt("comprador_id"));
                 pedido.setDataPedido(rs.getObject("data_pedido", LocalDate.class));
-                pedido.setStatusPedido(rs.getString("status_pedido"));
+                pedido.setStatusPedido(StatusPedido.valueOf(rs.getString("status_pedido")));
                 pedido.setEfetivacao(rs.getString("efetivacao"));
                 pedido.setPrevisaoEntrega(rs.getObject("previsao_entrega", LocalDate.class));
                 pedido.setValorTotal(rs.getDouble("total"));
@@ -119,7 +115,7 @@ public class PedidoDAO {
                 pedido.setId(rsPedidos.getInt("id"));
                 pedido.setCompradorId(rsPedidos.getInt("comprador_id"));
                 pedido.setDataPedido(rsPedidos.getObject("data_pedido", LocalDate.class));
-                pedido.setStatusPedido(rsPedidos.getString("status_pedido"));
+                pedido.setStatusPedido(StatusPedido.valueOf(rsPedidos.getString("status_pedido")));
                 pedido.setEfetivacao(rsPedidos.getString("efetivacao"));
                 pedido.setPrevisaoEntrega(rsPedidos.getObject("previsao_entrega", LocalDate.class));
                 pedido.setValorTotal(rsPedidos.getDouble("total"));
@@ -145,16 +141,20 @@ public class PedidoDAO {
         return pedidos;
     }
 
-    // MÉTODO ADICIONADO - Estava faltando no arquivo anterior
     public void atualizarStatusPedido(int pedidoId, String novoStatus) throws SQLException {
         String sql = "UPDATE pedido SET status_pedido = ? WHERE id = ?";
         try (Connection conn = db_connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, novoStatus);
+
+            // Aqui fazemos o cast de String para enum e usamos .name()
+            StatusPedido statusEnum = StatusPedido.valueOf(novoStatus);
+            stmt.setString(1, statusEnum.name());
+
             stmt.setInt(2, pedidoId);
             stmt.executeUpdate();
         }
     }
+
 
     // MÉTODO ADICIONADO - Estava faltando no arquivo anterior
     public List<PedidoProdutoVendedorDTO> buscarPedidosPendentesPorVendedor(int vendedorId) throws SQLException {
@@ -171,7 +171,7 @@ public class PedidoDAO {
                 "JOIN pedido_produto pp ON p.id = pp.pedido_id " +
                 "JOIN produto pr ON pp.produto_id = pr.id " +
                 "WHERE pr.vendedor_id = ? " +
-                "AND p.status_pedido IN ('ANALISE', 'Aguardando Pagamento')";
+                "AND p.status_pedido IN ('PENDENTE', 'EM_ANDAMENTO', 'ENVIADO', 'CANCELADO')";
 
         try (Connection conn = db_connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

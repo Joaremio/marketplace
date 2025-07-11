@@ -1,5 +1,7 @@
 package br.ufrn.imd.marketplace.model;
 
+import br.ufrn.imd.marketplace.StatusPedido;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +10,23 @@ public class Pedido {
     int id;
     int compradorId;
     LocalDate dataPedido;
-    String statusPedido;
+    private StatusPedido statusPedido;
     LocalDate previsaoEntrega;
     String efetivacao;
     Double valorTotal;
     String pagamentoForma;
     private List<PedidoProduto> itens;
+
+    public Pedido(String pagamentoForma, Double valorTotal, String efetivacao, LocalDate previsaoEntrega, StatusPedido statusPedido, LocalDate dataPedido, int compradorId, int id) {
+        this.pagamentoForma = pagamentoForma;
+        this.valorTotal = valorTotal;
+        this.efetivacao = efetivacao;
+        this.previsaoEntrega = previsaoEntrega;
+        this.statusPedido = statusPedido;
+        this.dataPedido = dataPedido;
+        this.compradorId = compradorId;
+        this.id = id;
+    }
 
     public List<PedidoProduto> getItens() {
         return itens;
@@ -30,17 +43,7 @@ public class Pedido {
         this.dataPedido = LocalDate.now();
     }
 
-    public Pedido(int id, int compradorId, LocalDate dataPedido, String statusPedido, LocalDate previsaoEntrega, String efetivacao, Double valorTotal, String pagamentoForma, List<PedidoProduto> itens) {
-        this.id = id;
-        this.compradorId = compradorId;
-        this.dataPedido = dataPedido;
-        this.statusPedido = statusPedido;
-        this.previsaoEntrega = previsaoEntrega;
-        this.efetivacao = efetivacao;
-        this.valorTotal = valorTotal;
-        this.pagamentoForma = pagamentoForma;
-        this.itens = itens;
-    }
+
 
 
     public int getId() {
@@ -67,13 +70,6 @@ public class Pedido {
         this.dataPedido = dataPedido;
     }
 
-    public String getStatusPedido() {
-        return statusPedido;
-    }
-
-    public void setStatusPedido(String statusPedido) {
-        this.statusPedido = statusPedido;
-    }
 
     public LocalDate getPrevisaoEntrega() {
         return previsaoEntrega;
@@ -107,4 +103,11 @@ public class Pedido {
         this.pagamentoForma = pagamentoForma;
     }
 
+    public StatusPedido getStatusPedido() {
+        return statusPedido;
+    }
+
+    public void setStatusPedido(StatusPedido statusPedido) {
+        this.statusPedido = statusPedido;
+    }
 }

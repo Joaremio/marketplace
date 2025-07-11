@@ -187,7 +187,7 @@ public class PedidoService {
                 dto.setId(pedido.getId());
                 dto.setDataPedido(pedido.getDataPedido().toString());
                 dto.setValorTotal(pedido.getValorTotal());
-                dto.setStatus(pedido.getStatusPedido());
+                dto.setStatus(pedido.getStatusPedido().name());
                 dto.setItens(itensDTO);
 
 
