@@ -9,6 +9,7 @@ public class PedidoProduto {
     private int quantidade;
     private double precoUnidade;
     private String imageUrl;
+    private String avaliacao;
 
     public PedidoProduto(Integer pedidoId, Integer produtoId, String nome, String vendedorNome, int quantidade, double precoUnidade, String imageUrl) {
         this.pedidoId = pedidoId;
@@ -78,5 +79,13 @@ public class PedidoProduto {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getAvaliacao() {
+        return avaliacao;
+    }
+
+    public void setAvaliacao(String avaliacao) {
+        this.avaliacao = avaliacao;
     }
 }

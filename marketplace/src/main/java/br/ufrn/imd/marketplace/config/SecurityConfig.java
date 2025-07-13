@@ -64,6 +64,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/listaDesejos/por-comprador/{compradorId}").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/listaDesejos/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/listaDesejos/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/pedido/{pedidoId}/{status}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "pedido/avaliacoes/produto/{produtoId}").permitAll()
+
 
 
 

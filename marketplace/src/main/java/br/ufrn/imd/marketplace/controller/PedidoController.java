@@ -1,5 +1,6 @@
 package br.ufrn.imd.marketplace.controller;
 
+import br.ufrn.imd.marketplace.dto.AvaliacaoRequest;
 import br.ufrn.imd.marketplace.model.Pedido;
 import br.ufrn.imd.marketplace.model.PedidoProduto;
 import br.ufrn.imd.marketplace.service.PedidoProdutoService;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pedido")
@@ -73,5 +76,17 @@ public class PedidoController {
     public ResponseEntity<?> removerItemAoPedido(@PathVariable int pedidoId, @PathVariable int itemId) {
         pedidoProdutoService.ExcluirItemAoPedido(pedidoId, itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/avaliar-item")
+    public ResponseEntity<?> avaliarItemPedido(@RequestBody AvaliacaoRequest request) {
+        pedidoProdutoService.avaliarProduto(request.getPedidoId(), request.getProdutoId(), request.getAvaliacao());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/avaliacoes/produto/{produtoId}")
+    public ResponseEntity<List<AvaliacaoRequest>> buscarAvaliacoesPorProduto(@PathVariable int produtoId) {
+        List<AvaliacaoRequest> avaliacoes = pedidoProdutoService.buscarAvaliacoesPorProduto(produtoId);
+        return ResponseEntity.ok(avaliacoes);
     }
 }

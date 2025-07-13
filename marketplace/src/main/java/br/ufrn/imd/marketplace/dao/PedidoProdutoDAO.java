@@ -1,6 +1,7 @@
 package br.ufrn.imd.marketplace.dao;
 
 import br.ufrn.imd.marketplace.config.DB_Connection;
+import br.ufrn.imd.marketplace.dto.AvaliacaoRequest;
 import br.ufrn.imd.marketplace.dto.ItemPedidoDTO;
 import br.ufrn.imd.marketplace.model.PedidoProduto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +132,6 @@ public class PedidoProdutoDAO {
                 item.setVendedorNome(rs.getString("vendedor_nome")); // se existir esse campo// Preenchendo o nome do produto
                 String url = rs.getString("imagem_url");
                 item.setImageUrl(url != null ? url : "https://via.placeholder.com/150");
-                System.out.println("DEBUG IMAGEM: " + item.getImageUrl());
                 itens.add(item);
             }
         }
@@ -160,5 +160,53 @@ public class PedidoProdutoDAO {
             stmt.setInt(1, pedidoId);
             stmt.executeUpdate();
         }
+    }
+
+    public void registrarAvaliacao(Integer pedidoId, Integer produtoId, String avaliacao) throws SQLException {
+        // Supondo que sua tabela pedido_produto tenha colunas 'nota' e 'comentario'
+        String sql = "UPDATE pedido_produto SET avaliacao = ?  WHERE PEDIDO_id = ? AND PRODUTO_id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, avaliacao);
+            stmt.setInt(2, pedidoId);
+            stmt.setInt(3, produtoId);
+
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<AvaliacaoRequest> listarAvaliacoesPorProduto(int produtoId) throws SQLException {
+        List<AvaliacaoRequest> avaliacoes = new ArrayList<>();
+
+        // Este SQL busca a avaliação e junta com as tabelas de pedido e usuário para pegar o nome e a data.
+        String sql = "SELECT " +
+                "    pp.avaliacao, " +
+                "    u.nome AS nome_comprador " +
+                "FROM " +
+                "    pedido_produto pp " +
+                "JOIN " +
+                "    pedido p ON pp.PEDIDO_id = p.id " +
+                "JOIN " +
+                "    usuario u ON p.comprador_id = u.id " +
+                "WHERE " +
+                "    pp.PRODUTO_id = ? AND pp.avaliacao IS NOT NULL ";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, produtoId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String avaliacao = rs.getString("avaliacao");
+                String nomeComprador = rs.getString("nome_comprador");
+
+
+                avaliacoes.add(new AvaliacaoRequest(avaliacao, nomeComprador));
+            }
+        }
+        return avaliacoes;
     }
 }
