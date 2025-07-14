@@ -44,9 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        // CORREÇÃO 1: Trocado hífen por barra
                         .requestMatchers("/usuarios/verificar/**").permitAll()
-
                         .requestMatchers("/administradores/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendedores").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendedores/pendentes").hasAuthority("ROLE_ADMIN")
@@ -67,8 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/pedido/{pedidoId}/{status}").permitAll()
                         .requestMatchers(HttpMethod.GET, "pedido/avaliacoes/produto/{produtoId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios/redefinir-senha").permitAll()
-
-
+                        .requestMatchers("/api/**").authenticated()
 
 
                         .anyRequest().authenticated()

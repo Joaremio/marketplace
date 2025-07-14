@@ -35,7 +35,6 @@ public class PedidoProdutoService {
 
     public void avaliarProduto(Integer pedidoId, Integer produtoId, String avaliacao) {
         try {
-            // Validações podem ser adicionadas aqui
             pedidoProdutoDAO.registrarAvaliacao(pedidoId, produtoId, avaliacao);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao registrar avaliação do produto.", e);
@@ -45,7 +44,6 @@ public class PedidoProdutoService {
         try {
             return pedidoProdutoDAO.listarAvaliacoesPorProduto(produtoId);
         } catch (SQLException e) {
-            // Trate o erro adequadamente
             throw new RuntimeException("Erro ao buscar avaliações do produto.", e);
         }
     }

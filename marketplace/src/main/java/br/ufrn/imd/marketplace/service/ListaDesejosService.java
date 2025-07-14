@@ -59,7 +59,6 @@ public class ListaDesejosService {
         try {
             return listaDesejosDAO.buscarProdutosCompletosDaLista(listaId);
         } catch (SQLException e) {
-            // Trate o erro de forma apropriada, com logs, etc.
             throw new RuntimeException("Erro ao buscar detalhes da lista de desejos", e);
         }
     }
