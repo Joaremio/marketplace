@@ -1,6 +1,7 @@
 package br.ufrn.imd.marketplace.controller;
 
 import br.ufrn.imd.marketplace.dto.LoginRequest;
+import br.ufrn.imd.marketplace.dto.RedefinirSenhaRequest;
 import br.ufrn.imd.marketplace.model.Usuario;
 import br.ufrn.imd.marketplace.service.AuthService;
 import br.ufrn.imd.marketplace.service.UsuarioService;
@@ -127,6 +128,16 @@ public class UsuarioController {
         Usuario atualizado = usuarioService.atualizarUsuario(id, usuarioAtualizado);
         return ResponseEntity.ok(atualizado);
     }
+
+    @PostMapping("/redefinir-senha")
+public ResponseEntity<?> redefinirSenha(@RequestBody RedefinirSenhaRequest request) {
+    try {
+        usuarioService.redefinirSenha(request.getEmail(), request.getCpf(), request.getNovaSenha());
+        return ResponseEntity.ok().body("Senha redefinida com sucesso!");
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarUsuario(@PathVariable int id) {

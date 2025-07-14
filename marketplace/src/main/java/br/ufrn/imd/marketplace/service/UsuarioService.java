@@ -231,6 +231,25 @@ public class UsuarioService {
     }
 }
 
+    public void redefinirSenha(String email, String cpf, String novaSenha) {
+    try {
+        // Busca o usuário pelo e-mail
+        Usuario usuario = usuarioDAO.buscarUsuarioPorEmail(email);
+
+        // Valida se o usuário existe e se o CPF corresponde
+        if (usuario == null || !usuario.getCpf().equals(cpf.replaceAll("\\D", ""))) {
+            throw new RuntimeException("E-mail ou CPF inválidos.");
+        }
+
+        // Criptografa e atualiza a nova senha
+        String senhaCriptografada = passwordEncoder.encode(novaSenha);
+        usuarioDAO.atualizarSenha(usuario.getId(), senhaCriptografada);
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Erro de banco de dados ao redefinir a senha.", e);
+    }
+}
+
     public void deletarUsuario(int id) {
         try {
             boolean deletado = usuarioDAO.deletarUsuario(id);

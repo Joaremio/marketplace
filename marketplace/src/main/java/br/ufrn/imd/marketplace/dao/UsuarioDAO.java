@@ -200,6 +200,15 @@ public class UsuarioDAO {
         }
     }
 
+     public void atualizarSenha(int usuarioId, String novaSenhaCriptografada) throws SQLException {
+        String sql = "UPDATE usuario SET senha = ? WHERE id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, novaSenhaCriptografada);
+            stmt.setInt(2, usuarioId);
+            stmt.executeUpdate();
+        }
+    }
 
 public boolean atualizarUsuario(Connection conn, int id, Usuario usuarioAtualizado) throws SQLException {
     String sql = "UPDATE usuario SET nome = ?, cpf = ?, email = ?, senha = ?, telefone = ? WHERE id = ?";
