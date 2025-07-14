@@ -156,51 +156,80 @@ public class UsuarioService {
     }
 
     public Usuario atualizarUsuario(int id, Usuario usuarioAtualizado) {
-        try {
-            Usuario usuarioExistente = usuarioDAO.buscarUsuarioById(id);
-            if (usuarioExistente == null) {
-                throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
-            }
+    Connection conn = null;
+    try {
+        conn = dbConnection.getConnection();
+        conn.setAutoCommit(false); // Início da transação
 
-            if (!usuarioExistente.getCpf().equals(usuarioAtualizado.getCpf())) {
-                Connection conn = dbConnection.getConnection();
-                if (usuarioDAO.existeCpf(conn,usuarioAtualizado.getCpf())) {
-                    throw new RuntimeException("CPF já está cadastrado no sistema");
-                }
-            }
+        // Buscar usuário existente
+        Usuario usuarioExistente = usuarioDAO.buscarUsuarioById(id);
+        if (usuarioExistente == null) {
+            throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
+        }
 
-            if (!usuarioExistente.getEmail().equals(usuarioAtualizado.getEmail())) {
-                Connection conn = dbConnection.getConnection();
-                if (usuarioDAO.existeEmail(conn,usuarioAtualizado.getEmail())) {
-                    throw new RuntimeException("Email já está cadastrado no sistema");
-                }
+        // Verificar duplicidade de CPF (se mudou)
+        if (!usuarioExistente.getCpf().equals(usuarioAtualizado.getCpf())) {
+            if (usuarioDAO.existeCpf(conn, usuarioAtualizado.getCpf())) {
+                throw new RuntimeException("CPF já está cadastrado no sistema");
             }
+        }
 
-            if (!usuarioExistente.getTelefone().equals(usuarioAtualizado.getTelefone())) {
-                Connection conn = dbConnection.getConnection();
-                if (usuarioDAO.existeTelefone(conn,usuarioAtualizado.getTelefone())) {
-                    throw new RuntimeException("Telefone já está cadastrado no sistema");
-                }
+        // Verificar duplicidade de email (se mudou)
+        if (!usuarioExistente.getEmail().equals(usuarioAtualizado.getEmail())) {
+            if (usuarioDAO.existeEmail(conn, usuarioAtualizado.getEmail())) {
+                throw new RuntimeException("Email já está cadastrado no sistema");
             }
-            
-            // Lógica para atualizar a senha, se necessário
-            if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
-                usuarioAtualizado.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
-            } else {
-                // Mantém a senha antiga se nenhuma nova for fornecida
-                usuarioAtualizado.setSenha(usuarioExistente.getSenha());
-            }
+        }
 
-            boolean atualizado = usuarioDAO.atualizarUsuario(id, usuarioAtualizado);
-            if (!atualizado) {
-                throw new RuntimeException("Erro ao atualizar usuário.");
+        // Verificar duplicidade de telefone (se mudou)
+        if (!usuarioExistente.getTelefone().equals(usuarioAtualizado.getTelefone())) {
+            if (usuarioDAO.existeTelefone(conn, usuarioAtualizado.getTelefone())) {
+                throw new RuntimeException("Telefone já está cadastrado no sistema");
             }
-            usuarioAtualizado.setId(id);
-            return usuarioAtualizado;
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar usuário", e);
+        }
+        
+        // Lógica para atualizar a senha, se necessário
+        if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
+            usuarioAtualizado.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+        } else {
+            // Mantém a senha antiga se nenhuma nova for fornecida
+            usuarioAtualizado.setSenha(usuarioExistente.getSenha());
+        }
+
+        // Preservar a data de cadastro original
+        usuarioAtualizado.setDataCadastro(usuarioExistente.getDataCadastro());
+
+        // Atualizar usuário usando a mesma conexão
+        boolean atualizado = usuarioDAO.atualizarUsuario(conn, id, usuarioAtualizado);
+        if (!atualizado) {
+            throw new RuntimeException("Erro ao atualizar usuário.");
+        }
+
+        conn.commit(); // Confirma a transação
+        
+        usuarioAtualizado.setId(id);
+        return usuarioAtualizado;
+
+    } catch (Exception e) {
+        if (conn != null) {
+            try {
+                conn.rollback(); // Desfaz a transação em caso de erro
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+        }
+        throw new RuntimeException("Erro ao atualizar usuário: " + e.getMessage(), e);
+    } finally {
+        if (conn != null) {
+            try {
+                conn.setAutoCommit(true); // Restaura o comportamento padrão
+                conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
+}
 
     public void deletarUsuario(int id) {
         try {

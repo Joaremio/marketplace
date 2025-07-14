@@ -200,22 +200,27 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean atualizarUsuario(int id, Usuario usuarioAtualizado) throws SQLException {
-        String sql = "UPDATE usuario SET nome = ?, cpf = ?, email = ?, senha = ?, telefone = ? WHERE id = ?";
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+public boolean atualizarUsuario(Connection conn, int id, Usuario usuarioAtualizado) throws SQLException {
+    String sql = "UPDATE usuario SET nome = ?, cpf = ?, email = ?, senha = ?, telefone = ? WHERE id = ?";
 
-            stmt.setString(1, usuarioAtualizado.getNome());
-            stmt.setString(2, usuarioAtualizado.getCpf());
-            stmt.setString(3, usuarioAtualizado.getEmail());
-            stmt.setString(4, usuarioAtualizado.getSenha());
-            stmt.setString(5, usuarioAtualizado.getTelefone());
-            stmt.setInt(6, id);
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, usuarioAtualizado.getNome());
+        stmt.setString(2, usuarioAtualizado.getCpf());
+        stmt.setString(3, usuarioAtualizado.getEmail());
+        stmt.setString(4, usuarioAtualizado.getSenha());
+        stmt.setString(5, usuarioAtualizado.getTelefone());
+        stmt.setInt(6, id);
 
-            return stmt.executeUpdate() > 0;
-        }
+        return stmt.executeUpdate() > 0;
     }
+}
+
+public boolean atualizarUsuario(int id, Usuario usuarioAtualizado) throws SQLException {
+    try (Connection conn = dbConnection.getConnection()) {
+        return atualizarUsuario(conn, id, usuarioAtualizado);
+    }
+}
 
     public boolean deletarUsuario(int id) throws SQLException {
         String sql = "DELETE FROM usuario WHERE id = ?";
