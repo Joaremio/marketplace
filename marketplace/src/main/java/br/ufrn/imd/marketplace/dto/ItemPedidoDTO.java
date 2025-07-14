@@ -3,11 +3,11 @@ package br.ufrn.imd.marketplace.dto;
 public class ItemPedidoDTO {
     private Integer pedidoId;
     private Integer produtoId;
-    private String nome; // Nome do Produto
+    private String nome;
     private String imageUrl;
     private int quantidade;
     private double precoUnitario;
-    private String vendedorNome; // Nome do Vendedor
+    private String vendedorNome;
 
     public ItemPedidoDTO() {}
 

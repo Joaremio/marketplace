@@ -54,10 +54,8 @@ public class ProdutoController {
 public ResponseEntity<?> buscarProdutosPorVendedor(@PathVariable int vendedorId) {
     try {
         List<ProdutoImagemDTO> produtos = produtoService.buscarProdutosPorVendedor(vendedorId);
-        // Isto retorna um ResponseEntity<List<ProdutoImagemDTO>>
         return ResponseEntity.ok(produtos);
     } catch (RuntimeException e) {
-        // Isto retorna um ResponseEntity<String>, o que agora é permitido pelo <?>
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }

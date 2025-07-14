@@ -32,10 +32,8 @@ public class VendedorController {
 public ResponseEntity<?> listarVendedores(@RequestParam(required = false) String status) {
     List<Vendedor> vendedores;
     if (status != null && !status.isEmpty()) {
-        // Se um status for fornecido (ex: /vendedores?status=PENDENTE), filtra por ele
         vendedores = vendedorService.listarVendedoresPorStatus(status);
     } else {
-        // Se nenhum status for fornecido, lista todos
         vendedores = vendedorService.listarVendedores();
     }
     return ResponseEntity.ok(vendedores);

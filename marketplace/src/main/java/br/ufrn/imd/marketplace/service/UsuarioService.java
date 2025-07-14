@@ -35,9 +35,8 @@ public class UsuarioService {
         Connection conn = null;
         try {
             conn = dbConnection.getConnection();
-            conn.setAutoCommit(false); // 🔁 Início da transação
+            conn.setAutoCommit(false);
 
-            // Verificações de duplicidade
             if (usuarioDAO.existeCpf(conn, usuario.getCpf())) {
                 throw new RuntimeException("CPF já está cadastrado no sistema");
             }
@@ -48,24 +47,20 @@ public class UsuarioService {
                 throw new RuntimeException("Telefone já está cadastrado no sistema");
             }
 
-            // Preparar dados
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
             usuario.setDataCadastro(LocalDate.now());
 
-            // Inserir usuário
             Usuario usuarioSalvo = usuarioDAO.inserirUsuario(conn, usuario);
-
-            // Inserir comprador e carrinho usando a mesma conexão
             compradorDAO.inserirComprador(conn, usuarioSalvo.getId());
             carrinhoDAO.criarCarrinho(conn, usuarioSalvo.getId());
 
-            conn.commit(); // ✅ Finaliza a transação
+            conn.commit();
             return usuarioSalvo;
 
         } catch (Exception e) {
             if (conn != null) {
                 try {
-                    conn.rollback(); // ❌ Desfaz tudo em caso de erro
+                    conn.rollback();
                 } catch (SQLException rollbackEx) {
                     rollbackEx.printStackTrace();
                 }
@@ -74,8 +69,8 @@ public class UsuarioService {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true); // Restaura o comportamento padrão
-                    conn.close(); // Libera a conexão
+                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -159,53 +154,44 @@ public class UsuarioService {
     Connection conn = null;
     try {
         conn = dbConnection.getConnection();
-        conn.setAutoCommit(false); // Início da transação
+        conn.setAutoCommit(false);
 
-        // Buscar usuário existente
         Usuario usuarioExistente = usuarioDAO.buscarUsuarioById(id);
         if (usuarioExistente == null) {
             throw new RuntimeException("Usuário com ID " + id + " não encontrado.");
         }
 
-        // Verificar duplicidade de CPF (se mudou)
         if (!usuarioExistente.getCpf().equals(usuarioAtualizado.getCpf())) {
             if (usuarioDAO.existeCpf(conn, usuarioAtualizado.getCpf())) {
                 throw new RuntimeException("CPF já está cadastrado no sistema");
             }
         }
 
-        // Verificar duplicidade de email (se mudou)
         if (!usuarioExistente.getEmail().equals(usuarioAtualizado.getEmail())) {
             if (usuarioDAO.existeEmail(conn, usuarioAtualizado.getEmail())) {
                 throw new RuntimeException("Email já está cadastrado no sistema");
             }
         }
 
-        // Verificar duplicidade de telefone (se mudou)
         if (!usuarioExistente.getTelefone().equals(usuarioAtualizado.getTelefone())) {
             if (usuarioDAO.existeTelefone(conn, usuarioAtualizado.getTelefone())) {
                 throw new RuntimeException("Telefone já está cadastrado no sistema");
             }
         }
         
-        // Lógica para atualizar a senha, se necessário
         if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
             usuarioAtualizado.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
         } else {
-            // Mantém a senha antiga se nenhuma nova for fornecida
             usuarioAtualizado.setSenha(usuarioExistente.getSenha());
         }
 
-        // Preservar a data de cadastro original
         usuarioAtualizado.setDataCadastro(usuarioExistente.getDataCadastro());
-
-        // Atualizar usuário usando a mesma conexão
         boolean atualizado = usuarioDAO.atualizarUsuario(conn, id, usuarioAtualizado);
         if (!atualizado) {
             throw new RuntimeException("Erro ao atualizar usuário.");
         }
 
-        conn.commit(); // Confirma a transação
+        conn.commit();
         
         usuarioAtualizado.setId(id);
         return usuarioAtualizado;
@@ -213,7 +199,7 @@ public class UsuarioService {
     } catch (Exception e) {
         if (conn != null) {
             try {
-                conn.rollback(); // Desfaz a transação em caso de erro
+                conn.rollback();
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
@@ -222,7 +208,7 @@ public class UsuarioService {
     } finally {
         if (conn != null) {
             try {
-                conn.setAutoCommit(true); // Restaura o comportamento padrão
+                conn.setAutoCommit(true);
                 conn.close();
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -233,15 +219,12 @@ public class UsuarioService {
 
     public void redefinirSenha(String email, String cpf, String novaSenha) {
     try {
-        // Busca o usuário pelo e-mail
         Usuario usuario = usuarioDAO.buscarUsuarioPorEmail(email);
 
-        // Valida se o usuário existe e se o CPF corresponde
         if (usuario == null || !usuario.getCpf().equals(cpf.replaceAll("\\D", ""))) {
             throw new RuntimeException("E-mail ou CPF inválidos.");
         }
 
-        // Criptografa e atualiza a nova senha
         String senhaCriptografada = passwordEncoder.encode(novaSenha);
         usuarioDAO.atualizarSenha(usuario.getId(), senhaCriptografada);
 

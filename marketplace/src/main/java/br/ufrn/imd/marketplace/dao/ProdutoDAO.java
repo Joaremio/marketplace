@@ -19,7 +19,6 @@ public class ProdutoDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    // ✅ Método 1: Cadastrar produto + imagem
     public ProdutoImagemDTO cadastrarProduto(int vendedorId, ProdutoImagemDTO produto) throws SQLException {
         String sql = "INSERT INTO produto (vendedor_id, nome, preco, descricao, estoque, categoria) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -64,7 +63,6 @@ public class ProdutoDAO {
         }
     }
 
-    // ✅ Método 2: Buscar produtos ativos com filtro
     public List<ProdutoImagemDTO> buscarProdutosAtivos(String nome, String categoria) throws SQLException {
         List<ProdutoImagemDTO> produtos = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
@@ -110,7 +108,6 @@ public class ProdutoDAO {
         return produtos;
     }
 
-    // ✅ Método 3: Buscar produtos de um vendedor
     public List<ProdutoImagemDTO> buscarProdutosPorVendedor(int vendedorId) throws SQLException {
         String sql = """
             SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl
@@ -143,8 +140,6 @@ public class ProdutoDAO {
             return produtos;
         }
     }
-
-    // ✅ Método 4: Buscar produto específico por ID e vendedor
     public ProdutoImagemDTO buscarProdutoPorId(int vendedorId, int produtoId) throws SQLException {
         String sql = """
             SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl
@@ -200,7 +195,6 @@ public class ProdutoDAO {
         return null;
     }
 
-    // ✅ Método 5: Desativar produto
     public boolean desativarProduto(int vendedorId, int produtoId) throws SQLException {
         String sql = "UPDATE produto SET ativo = false WHERE vendedor_id = ? AND id = ?";
 
@@ -212,7 +206,6 @@ public class ProdutoDAO {
         }
     }
 
-    // ✅ Método 6: Atualizar produto e imagem
     public ProdutoImagemDTO atualizarProduto(int produtoId, int vendedorId, ProdutoImagemDTO produtoAtualizado) throws SQLException {
         String sql = """
             UPDATE produto SET nome = ?, preco = ?, descricao = ?, estoque = ?, categoria = ?
@@ -242,7 +235,6 @@ public class ProdutoDAO {
         }
     }
 
-    // ✅ Método 7: Deletar produto
     public boolean deletarProduto(int produtoId) throws SQLException {
         Connection conn = dbConnection.getConnection();
         conn.setAutoCommit(false);
@@ -265,13 +257,6 @@ public class ProdutoDAO {
         }
     }
 
-    /**
-     * NOVO MÉTODO ADICIONADO: Busca um único produto pelo seu ID, independente do vendedor.
-     * Essencial para o PedidoService validar o preço dos itens no carrinho.
-     * @param produtoId O ID do produto a ser buscado.
-     * @return um ProdutoImagemDTO se encontrado, ou null caso contrário.
-     * @throws SQLException
-     */
     public ProdutoImagemDTO buscarProdutoPorId(int produtoId) throws SQLException {
         String sql = """
             SELECT p.id, p.vendedor_id, p.nome, p.preco, p.descricao, p.estoque, p.categoria, i.imagem AS imageUrl

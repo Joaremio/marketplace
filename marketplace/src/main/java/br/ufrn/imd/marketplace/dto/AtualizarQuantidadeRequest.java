@@ -5,7 +5,6 @@ public class AtualizarQuantidadeRequest {
     private int produtoId;
     private int quantidade;
 
-    // Getters e Setters
     public int getCarrinhoId() { return carrinhoId; }
     public void setCarrinhoId(int carrinhoId) { this.carrinhoId = carrinhoId; }
     public int getProdutoId() { return produtoId; }

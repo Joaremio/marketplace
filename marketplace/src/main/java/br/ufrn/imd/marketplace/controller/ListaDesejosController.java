@@ -46,14 +46,12 @@ public class ListaDesejosController {
                     .body("Nenhum produto encontrado para essa lista.");
         }
 
-        return ResponseEntity.ok(produtoIds);  // Exemplo de retorno: [4, 7, 10]
+        return ResponseEntity.ok(produtoIds);
     }
 
     @GetMapping("/{listaId}/detalhes")
     public ResponseEntity<List<ProdutoImagemDTO>> getProdutosDetalhadosDaLista(@PathVariable int listaId) {
         List<ProdutoImagemDTO> produtos = listaDesejosService.buscarProdutosCompletosDaLista(listaId);
-        // Não precisa mais verificar se está vazio, o frontend pode fazer isso.
-        // Retornar uma lista vazia com status 200 OK é o padrão.
         return ResponseEntity.ok(produtos);
     }
 
@@ -63,17 +61,12 @@ public class ListaDesejosController {
         return ResponseEntity.ok(listas);
     }
 
-    // Adicione estes dois novos endpoints ao seu Controller
-
-    // Endpoint para atualizar o nome
     @PutMapping("/{listaId}")
     public ResponseEntity<?> atualizarNomeLista(@PathVariable int listaId, @RequestBody ListaDesejos lista) {
-        // O DTO/Model recebido deve conter o novo nome
         listaDesejosService.atualizarNomeLista(listaId, lista.getNome());
         return ResponseEntity.ok().build();
     }
 
-    // Endpoint para excluir a lista
     @DeleteMapping("/{listaId}")
     public ResponseEntity<?> excluirLista(@PathVariable int listaId) {
         listaDesejosService.excluirLista(listaId);

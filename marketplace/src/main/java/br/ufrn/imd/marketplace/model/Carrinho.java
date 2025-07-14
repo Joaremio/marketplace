@@ -1,12 +1,12 @@
 package br.ufrn.imd.marketplace.model;
 
-import br.ufrn.imd.marketplace.dto.ProdutoCarrinhoDetalhado; // 1. IMPORTAR O DTO
+import br.ufrn.imd.marketplace.dto.ProdutoCarrinhoDetalhado;
 import java.util.List;
 
 public class Carrinho {
     int id;
     int compradorId;
-    private List<ProdutoCarrinhoDetalhado> produtos; // 2. ADICIONAR A LISTA
+    private List<ProdutoCarrinhoDetalhado> produtos;
 
     public Carrinho(int id, int compradorId) {
         this.id = id;
@@ -15,7 +15,6 @@ public class Carrinho {
 
     public Carrinho() {}
 
-    // 3. ADICIONAR GETTERS E SETTERS PARA A LISTA
     public List<ProdutoCarrinhoDetalhado> getProdutos() {
         return produtos;
     }
@@ -24,7 +23,6 @@ public class Carrinho {
         this.produtos = produtos;
     }
 
-    // Getters e Setters existentes
     public int getId() {
         return id;
     }

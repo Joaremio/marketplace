@@ -24,9 +24,6 @@ public class PedidoDAO {
     @Autowired
     private PedidoProdutoDAO pedidoProdutoDAO;
 
-    // Dentro da classe PedidoDAO.java
-
-    // MUDANÇA: Método sobrecarregado que aceita uma conexão externa para transações
     public Pedido criarPedido(Pedido pedido, Connection conn) throws SQLException {
         String sql = "INSERT INTO pedido (comprador_id, data_pedido, previsao_entrega, efetivacao, total, pagamento_forma, status_pedido) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -45,24 +42,20 @@ public class PedidoDAO {
             stmt.setDouble(5, pedido.getValorTotal());
             stmt.setString(6, pedido.getPagamentoForma());
 
-            // Aqui forçando o status PENDENTE na criação
             stmt.setString(7, StatusPedido.PENDENTE.name());
 
-            // Executar insert e recuperar id gerado...
-            // (se necessário continuar código para recuperar ID e retornar pedido atualizado)
+
         }
         return pedido;
     }
 
 
-    // O método original pode ser mantido para chamadas não transacionais, se necessário
     public Pedido criarPedido(Pedido pedido) throws SQLException {
         try (Connection conn = db_connection.getConnection()) {
             return criarPedido(pedido, conn);
         }
     }
 
-    // MÉTODO ADICIONADO - Estava faltando no arquivo anterior
     public void excluirPedido(int pedidoId) throws SQLException {
         String sql = "DELETE FROM pedido WHERE id = ?";
         try (Connection conn = db_connection.getConnection();
@@ -72,7 +65,6 @@ public class PedidoDAO {
         }
     }
 
-    // MÉTODO ADICIONADO - Estava faltando no arquivo anterior
     public Pedido buscarPedido(int pedidoId) throws SQLException {
         String sql = "SELECT * FROM pedido WHERE id = ?";
         try (Connection conn = db_connection.getConnection();
@@ -99,7 +91,6 @@ public class PedidoDAO {
     }
 
 
-    // MUDANÇA: CORREÇÃO DO PROBLEMA N+1 QUERY
     public List<Pedido> buscarPedidosPorComprador(int compradorId) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         String sqlPedidos = "SELECT * FROM pedido WHERE comprador_id = ?";
@@ -146,7 +137,6 @@ public class PedidoDAO {
         try (Connection conn = db_connection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Aqui fazemos o cast de String para enum e usamos .name()
             StatusPedido statusEnum = StatusPedido.valueOf(novoStatus);
             stmt.setString(1, statusEnum.name());
 
@@ -156,7 +146,6 @@ public class PedidoDAO {
     }
 
 
-    // MÉTODO ADICIONADO - Estava faltando no arquivo anterior
     public List<PedidoProdutoVendedorDTO> buscarPedidosPendentesPorVendedor(int vendedorId) throws SQLException {
         List<PedidoProdutoVendedorDTO> lista = new ArrayList<>();
         String sql = "SELECT " +

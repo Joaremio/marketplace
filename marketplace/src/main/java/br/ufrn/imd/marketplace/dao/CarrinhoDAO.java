@@ -29,12 +29,10 @@ public class CarrinhoDAO {
             stmt.setInt(1, usuarioId);
             stmt.executeUpdate();
 
-            // Pegando o ID gerado automaticamente
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 int carrinhoId = rs.getInt(1);
 
-                // Criando e retornando o objeto Carrinho com ID e usuário
                 Carrinho carrinho = new Carrinho();
                 carrinho.setId(carrinhoId);
                 carrinho.setCompradorId(usuarioId);

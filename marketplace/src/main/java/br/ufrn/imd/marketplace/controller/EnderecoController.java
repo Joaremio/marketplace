@@ -23,12 +23,6 @@ public class EnderecoController {
     @Autowired
     private CepService cepService;
 
-    // O CepService não é mais necessário aqui
-
-    /**
-     * Endpoint para criar um novo endereço completo (Endereço + CEP).
-     * A lógica foi movida para o EnderecoService.
-     */
     @PostMapping("/{usuarioId}")
     public ResponseEntity<?> inserirEndereco(@PathVariable int usuarioId, @RequestBody EnderecoCepDTO dto) {
         try {
@@ -39,10 +33,6 @@ public class EnderecoController {
         }
     }
 
-    /**
-     * Endpoint para atualizar um endereço existente.
-     * Retorna o objeto DTO atualizado.
-     */
     @PutMapping("/{usuarioId}/endereco/{enderecoId}")
     public ResponseEntity<?> atualizarEndereco(
             @PathVariable int usuarioId,

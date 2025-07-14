@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections; // 2. Importar Collections
+import java.util.Collections;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -47,15 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.usuarioService.buscarPorEmail(userEmail);
 
-            // 3. EXTRAIR O PERFIL (ROLE) DIRETAMENTE DO TOKEN
             final String role = jwtService.extractClaim(jwt, claims -> (String) claims.get("role"));
 
             if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                // 4. CRIAR A AUTORIDADE (PERFIL) USANDO A INFORMAÇÃO DO TOKEN
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        // Cria uma lista de permissões com o perfil extraído do token
                         Collections.singletonList(new SimpleGrantedAuthority(role))
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

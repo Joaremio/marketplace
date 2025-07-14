@@ -33,7 +33,6 @@ public class EnderecoDAO {
 
             stmt.executeUpdate();
 
-            // recupera o id gerado pelo banco
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int idGerado = generatedKeys.getInt(1);
@@ -41,7 +40,7 @@ public class EnderecoDAO {
                 }
             }
 
-            endereco.setUsuarioId(usuarioId); // garante que o objeto final tenha o usuário certo
+            endereco.setUsuarioId(usuarioId);
             return endereco;
         }
     }
@@ -216,7 +215,7 @@ public class EnderecoDAO {
             }
         }
 
-        return null; // caso não encontre
+        return null;
     }
 
     public void desmarcarEnderecosPrincipais(int usuarioId) throws SQLException {

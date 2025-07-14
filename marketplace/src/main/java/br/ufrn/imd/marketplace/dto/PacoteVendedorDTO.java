@@ -9,7 +9,7 @@ public class PacoteVendedorDTO {
     private String vendedorNome;
     private LocalDate previsaoEntrega;
     private String statusPacote;
-    private List<ItemPedidoDTO> itens; // Cada pacote tem sua própria lista de itens
+    private List<ItemPedidoDTO> itens; 
 
     // Getters e Setters
     public String getVendedorNome() {

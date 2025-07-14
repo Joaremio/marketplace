@@ -49,7 +49,6 @@ public class UsuarioController {
         }
     }
 
-    // Endpoint de Login
     @PostMapping("/login")
     public ResponseEntity<?> autenticarUsuario(@RequestBody LoginRequest loginRequest) {
         try {
@@ -62,7 +61,6 @@ public class UsuarioController {
         }
     }
 
-    // Endpoint para verificar se CPF já existe
     @GetMapping("/verificar-cpf/{cpf}")
     public ResponseEntity<?> verificarCpf(@PathVariable String cpf) {
         try {
@@ -78,7 +76,6 @@ public class UsuarioController {
         }
     }
 
-    // Endpoint para verificar se email já existe
     @GetMapping("/verificar-email")
     public ResponseEntity<?> verificarEmail(@RequestParam String email) {
         try {
@@ -94,7 +91,6 @@ public class UsuarioController {
         }
     }
 
-    // Endpoint para verificar se telefone já existe
     @GetMapping("/verificar-telefone")
     public ResponseEntity<?> verificarTelefone(@RequestParam String telefone) {
         try {

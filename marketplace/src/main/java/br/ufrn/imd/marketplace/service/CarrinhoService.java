@@ -39,7 +39,6 @@ public class CarrinhoService {
 
     public void inserirProduto(CarrinhoProduto produto) {
         try {
-            // Busca o produto para verificar o estoque
             ProdutoImagemDTO produtoInfo = produtoDAO.buscarProdutoPorId(produto.getProdutoId());
             
             if (produtoInfo == null) {
@@ -50,7 +49,6 @@ public class CarrinhoService {
                 int quantidadeAtual = carrinhoDAO.obterQuantidadeDoProduto(produto.getCarrinhoId(), produto.getProdutoId());
                 int novaQuantidade = quantidadeAtual + produto.getQuantidade();
                 
-                // Verifica se a nova quantidade não excede o estoque
                 if (novaQuantidade > produtoInfo.getEstoque()) {
                     throw new RuntimeException("Quantidade solicitada (" + novaQuantidade + 
                         ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
@@ -59,7 +57,6 @@ public class CarrinhoService {
                 produto.setQuantidade(novaQuantidade);
                 carrinhoDAO.atualizarQuantidade(produto);
             } else {
-                // Verifica se a quantidade inicial não excede o estoque
                 if (produto.getQuantidade() > produtoInfo.getEstoque()) {
                     throw new RuntimeException("Quantidade solicitada (" + produto.getQuantidade() + 
                         ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
@@ -74,13 +71,10 @@ public class CarrinhoService {
 
     public Carrinho buscarCarrinhoCompletoPorUsuarioId(int usuarioId) {
         try {
-            // 1. Busca o "casco" do carrinho
             Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
 
-            // 2. Se o carrinho existir, busca seus produtos detalhados
             if (carrinho != null) {
                 List<ProdutoCarrinhoDetalhado> produtos = carrinhoDAO.obterProdutosDetalhadosDoCarrinho(carrinho.getId());
-                // 3. Anexa a lista de produtos ao objeto carrinho
                 carrinho.setProdutos(produtos);
             }
 
@@ -116,24 +110,18 @@ public class CarrinhoService {
 
     public Optional<Carrinho> getCarrinhoByID(int usuarioId) {
         try {
-            // O DAO já retorna null se não encontrar, o que é perfeito para o Optional.
             Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
-
-            // Converte o resultado (que pode ser null) em um Optional.
             return Optional.ofNullable(carrinho);
         } catch (SQLException e) {
-            // Para erros de SQL reais, ainda lançamos uma exceção de runtime.
             throw new RuntimeException("Erro de banco de dados ao buscar carrinho", e);
         }
     }
 
     public void removerProduto(int usuarioId, int produtoId) {
         try {
-            // 1. Encontra o carrinho do usuário para obter o carrinhoId
             Carrinho carrinho = carrinhoDAO.getCarrinhoPorId(usuarioId);
 
             if (carrinho != null) {
-                // 2. Com o carrinhoId em mãos, chama o DAO para remover o item específico
                 carrinhoDAO.removerProdutoDoCarrinho(carrinho.getId(), produtoId);
             } else {
                 throw new RuntimeException("Carrinho não encontrado para o usuário com ID: " + usuarioId);
@@ -145,20 +133,17 @@ public class CarrinhoService {
 
     public void atualizarQuantidade(CarrinhoProduto produto) {
         try {
-            // Busca o produto para verificar o estoque
             ProdutoImagemDTO produtoInfo = produtoDAO.buscarProdutoPorId(produto.getProdutoId());
             
             if (produtoInfo == null) {
                 throw new RuntimeException("Produto não encontrado");
             }
 
-            // Verifica se a quantidade solicitada não excede o estoque
             if (produto.getQuantidade() > produtoInfo.getEstoque()) {
                 throw new RuntimeException("Quantidade solicitada (" + produto.getQuantidade() + 
                     ") excede o estoque disponível (" + produtoInfo.getEstoque() + ")");
             }
 
-            // Verifica se a quantidade é válida (maior que 0)
             if (produto.getQuantidade() <= 0) {
                 throw new RuntimeException("Quantidade deve ser maior que zero");
             }

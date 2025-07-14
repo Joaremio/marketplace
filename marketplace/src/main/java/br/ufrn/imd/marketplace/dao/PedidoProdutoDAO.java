@@ -21,11 +21,6 @@ public class PedidoProdutoDAO {
     @Autowired
     private DB_Connection dbConnection;
 
-    /**
-     * Versão sobrecarregada que aceita uma conexão externa para transações.
-     * @param item O PedidoProduto a ser salvo.
-     * @param conn A conexão de banco de dados já existente e transacional.
-     */
     public void adicionarItemAoPedido(PedidoProduto item, Connection conn) throws SQLException {
         String sql = "INSERT INTO pedido_produto (PEDIDO_id, PRODUTO_id, quantidade, preco_unitario) " +
                 "VALUES (?, ?, ?, ?)";
@@ -38,24 +33,15 @@ public class PedidoProdutoDAO {
         }
     }
 
-    /**
-     * Método original mantido para uso fora de transações complexas.
-     */
     public void adicionarItemAoPedido(PedidoProduto item) throws SQLException {
         try (Connection conn = dbConnection.getConnection()) {
             adicionarItemAoPedido(item, conn);
         }
     }
 
-    /**
-     * Busca os itens de um único pedido, incluindo o nome do produto.
-     * @param pedidoId O ID do pedido.
-     * @return Uma lista de PedidoProduto com todos os dados, incluindo o nome.
-     */
     public List<PedidoProduto> ListarItensDoPedido(int pedidoId) throws SQLException {
         List<PedidoProduto> itens = new ArrayList<>();
 
-        // 🚨 Atualize sua query para também trazer o nome do vendedor
         String sql = "SELECT pp.*, p.nome AS nome_produto, u.nome AS nome_vendedor " +
                 "FROM pedido_produto pp " +
                 "JOIN produto p ON pp.PRODUTO_id = p.id " +
@@ -73,21 +59,14 @@ public class PedidoProdutoDAO {
                 item.setProdutoId(rs.getInt("PRODUTO_id"));
                 item.setQuantidade(rs.getInt("quantidade"));
                 item.setPrecoUnidade(rs.getDouble("preco_unitario"));
-                item.setNome(rs.getString("nome_produto")); // Nome do produto
-                item.setVendedorNome(rs.getString("nome_vendedor")); // 💡 Nome do vendedor
+                item.setNome(rs.getString("nome_produto"));
+                item.setVendedorNome(rs.getString("nome_vendedor"));
                 itens.add(item);
             }
         }
         return itens;
     }
 
-
-    /**
-     * Essencial para corrigir o problema de performance N+1.
-     * Busca todos os itens de múltiplos pedidos em uma única consulta.
-     * @param pedidoIds Uma lista de IDs de pedidos.
-     * @return Uma lista com todos os PedidoProduto encontrados, incluindo o nome.
-     */
     public List<PedidoProduto> listarItensParaMultiplosPedidos(List<Integer> pedidoIds) throws SQLException {
         if (pedidoIds == null || pedidoIds.isEmpty()) {
             return Collections.emptyList();
@@ -103,7 +82,7 @@ public class PedidoProdutoDAO {
                 "    pp.pedido_id, " +
                 "    p.nome AS produto_nome, " +
                 "    u.nome AS vendedor_nome, " +
-                "    i.imagem AS imagem_url " + // Pegando imagem com LEFT JOIN
+                "    i.imagem AS imagem_url " +
                 "FROM " +
                 "    pedido_produto pp " +
                 "JOIN produto p ON pp.produto_id = p.id " +
@@ -128,8 +107,8 @@ public class PedidoProdutoDAO {
                 item.setProdutoId(rs.getInt("produto_id"));
                 item.setQuantidade(rs.getInt("quantidade"));
                 item.setPrecoUnidade(rs.getDouble("preco_unitario"));
-                item.setNome(rs.getString("produto_nome")); // não "nome"
-                item.setVendedorNome(rs.getString("vendedor_nome")); // se existir esse campo// Preenchendo o nome do produto
+                item.setNome(rs.getString("produto_nome"));
+                item.setVendedorNome(rs.getString("vendedor_nome"));
                 String url = rs.getString("imagem_url");
                 item.setImageUrl(url != null ? url : "https://via.placeholder.com/150");
                 itens.add(item);
@@ -149,10 +128,6 @@ public class PedidoProdutoDAO {
         }
     }
 
-    /**
-     * Usado para limpar os itens de um pedido, por exemplo, ao excluir o pedido pai.
-     * @param pedidoId O ID do pedido cujos itens serão excluídos.
-     */
     public void excluirItensPorPedidoId(int pedidoId) throws SQLException {
         String sql = "DELETE FROM pedido_produto WHERE PEDIDO_id = ?";
         try (Connection conn = dbConnection.getConnection();
@@ -163,7 +138,7 @@ public class PedidoProdutoDAO {
     }
 
     public void registrarAvaliacao(Integer pedidoId, Integer produtoId, String avaliacao) throws SQLException {
-        // Supondo que sua tabela pedido_produto tenha colunas 'nota' e 'comentario'
+
         String sql = "UPDATE pedido_produto SET avaliacao = ?  WHERE PEDIDO_id = ? AND PRODUTO_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -180,7 +155,6 @@ public class PedidoProdutoDAO {
     public List<AvaliacaoRequest> listarAvaliacoesPorProduto(int produtoId) throws SQLException {
         List<AvaliacaoRequest> avaliacoes = new ArrayList<>();
 
-        // Este SQL busca a avaliação e junta com as tabelas de pedido e usuário para pegar o nome e a data.
         String sql = "SELECT " +
                 "    pp.avaliacao, " +
                 "    u.nome AS nome_comprador " +

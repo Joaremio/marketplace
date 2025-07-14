@@ -67,13 +67,12 @@ public class CarrinhoController {
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<?> getCarrinhoPorUsuario(@PathVariable int usuarioId) {
         try {
-            // Chama o serviço que retorna o objeto completo
             Carrinho carrinhoCompleto = carrinhoService.buscarCarrinhoCompletoPorUsuarioId(usuarioId);
 
             if (carrinhoCompleto != null) {
-                return ResponseEntity.ok(carrinhoCompleto); // Retorna 200 OK com o carrinho e seus produtos
+                return ResponseEntity.ok(carrinhoCompleto);
             } else {
-                return ResponseEntity.notFound().build(); // Retorna 404 se o usuário não tiver um carrinho
+                return ResponseEntity.notFound().build();
             }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

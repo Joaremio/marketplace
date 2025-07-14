@@ -4,8 +4,8 @@ package br.ufrn.imd.marketplace.model;
 public class PedidoProduto {
     private Integer pedidoId;
     private Integer produtoId;
-    private String nome;           // nome do produto
-    private String vendedorNome;   // nome do vendedor
+    private String nome;           
+    private String vendedorNome;
     private int quantidade;
     private double precoUnidade;
     private String imageUrl;

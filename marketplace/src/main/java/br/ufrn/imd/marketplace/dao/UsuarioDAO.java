@@ -45,7 +45,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Método para verificar se CPF já existe
     public boolean existeCpf(Connection conn, String cpf) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE cpf = ?";
         
@@ -62,7 +61,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Método para verificar se email já existe
     public boolean existeEmail(Connection conn, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
         
@@ -78,8 +76,6 @@ public class UsuarioDAO {
             }
         }
     }
-
-    // Método para verificar se telefone já existe
     public boolean existeTelefone(Connection conn ,String telefone) throws SQLException {
         String sql = "SELECT COUNT(*) FROM usuario WHERE telefone = ?";
         
@@ -96,7 +92,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Método para buscar usuário por CPF
     public Usuario buscarUsuarioPorCpf(String cpf) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE cpf = ?";
 
@@ -123,7 +118,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Método para buscar usuário por email
     public Usuario buscarUsuarioPorEmail(String email) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE email = ?";
 
