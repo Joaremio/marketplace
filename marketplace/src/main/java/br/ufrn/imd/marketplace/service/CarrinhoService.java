@@ -153,4 +153,15 @@ public class CarrinhoService {
             throw new RuntimeException("Erro ao atualizar quantidade do produto", e);
         }
     }
+
+    public void esvaziarCarrinho(int carrinhoId) {
+        try {
+            carrinhoDAO.removerTodosProdutosDoCarrinho(carrinhoId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao esvaziar carrinho", e);
+        }
+    }
+
+
+
 }

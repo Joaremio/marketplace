@@ -88,4 +88,12 @@ public class CarrinhoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{carrinhoId}/esvaziar")
+    public ResponseEntity<Void> esvaziarCarrinho(@PathVariable int carrinhoId) {
+        carrinhoService.esvaziarCarrinho(carrinhoId);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

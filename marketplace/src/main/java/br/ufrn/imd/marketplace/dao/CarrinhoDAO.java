@@ -186,6 +186,16 @@ public class CarrinhoDAO {
     }
 }
 
+    public void removerTodosProdutosDoCarrinho(int carrinhoId) throws SQLException {
+        String sql = "DELETE FROM carrinho_produto WHERE carrinho_id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, carrinhoId);
+            stmt.executeUpdate();
+        }
+    }
+
+
 
 
 }
