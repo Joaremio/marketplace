@@ -24,6 +24,7 @@ public class PedidoDAO {
     @Autowired
     private PedidoProdutoDAO pedidoProdutoDAO;
 
+    // Em PedidoDAO.java - VERSÃO CORRIGIDA
     public Pedido criarPedido(Pedido pedido, Connection conn) throws SQLException {
         String sql = "INSERT INTO pedido (comprador_id, data_pedido, previsao_entrega, efetivacao, total, pagamento_forma, status_pedido) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -41,11 +42,27 @@ public class PedidoDAO {
 
             stmt.setDouble(5, pedido.getValorTotal());
             stmt.setString(6, pedido.getPagamentoForma());
+            stmt.setString(7, "PENDENTE"); // Usando a string diretamente ou StatusPedido.PENDENTE.name()
 
-            stmt.setString(7, StatusPedido.PENDENTE.name());
+            // 1. Executar o INSERT
+            int affectedRows = stmt.executeUpdate();
 
+            if (affectedRows == 0) {
+                throw new SQLException("A criação do pedido falhou, nenhuma linha afetada.");
+            }
 
+            // 2. Recuperar o ID gerado pelo banco de dados
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    // 3. Definir o ID no objeto 'pedido'
+                    pedido.setId(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("A criação do pedido falhou, nenhum ID foi obtido.");
+                }
+            }
         }
+
+        // 4. Retornar o objeto 'pedido' agora com o ID correto
         return pedido;
     }
 
