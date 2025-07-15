@@ -1,11 +1,14 @@
 package br.ufrn.imd.marketplace.dao;
 
 import br.ufrn.imd.marketplace.config.DB_Connection;
+import br.ufrn.imd.marketplace.dto.ChatDTO;
 import br.ufrn.imd.marketplace.model.Chat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class ChatDAO {
@@ -48,5 +51,37 @@ public class ChatDAO {
             }
         }
         return chat;
+    }
+
+    public List<ChatDTO> buscarChatsPorUsuarioId(int usuarioId) throws SQLException {
+        List<ChatDTO> chats = new ArrayList<>();
+        String sql = """
+            SELECT c.id, c.comprador_id, c.vendedor_id, c.data_criacao,
+                   u_comprador.nome AS nome_comprador,
+                   u_vendedor.nome AS nome_vendedor
+            FROM chat c
+            JOIN usuario u_comprador ON c.comprador_id = u_comprador.id
+            JOIN usuario u_vendedor ON c.vendedor_id = u_vendedor.id
+            WHERE c.comprador_id = ? OR c.vendedor_id = ?
+            ORDER BY c.id DESC
+        """;
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, usuarioId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ChatDTO chatDto = new ChatDTO();
+                    chatDto.setId(rs.getInt("id"));
+                    chatDto.setCompradorId(rs.getInt("comprador_id"));
+                    chatDto.setVendedorId(rs.getInt("vendedor_id"));
+                    chatDto.setDataCriacao(rs.getObject("data_criacao", LocalDate.class));
+                    chatDto.setNomeComprador(rs.getString("nome_comprador"));
+                    chatDto.setNomeVendedor(rs.getString("nome_vendedor"));
+                    chats.add(chatDto);
+                }
+            }
+        }
+        return chats;
     }
 }

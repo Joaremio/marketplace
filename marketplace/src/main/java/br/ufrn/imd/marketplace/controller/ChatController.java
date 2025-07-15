@@ -1,5 +1,6 @@
 package br.ufrn.imd.marketplace.controller;
 
+import br.ufrn.imd.marketplace.dto.ChatDTO;
 import br.ufrn.imd.marketplace.model.Chat;
 import br.ufrn.imd.marketplace.model.Mensagem;
 import br.ufrn.imd.marketplace.service.ChatService;
@@ -41,4 +42,11 @@ public class ChatController {
         Mensagem mensagemSalva = mensagemService.salvarMensagem(mensagem);
         return ResponseEntity.ok(mensagemSalva);
     }
+
+    @GetMapping("/chats/usuario/{usuarioId}")
+    public ResponseEntity<List<ChatDTO>> getChatsDoUsuario(@PathVariable int usuarioId) {
+        List<ChatDTO> chats = chatService.buscarChatsPorUsuario(usuarioId);
+        return ResponseEntity.ok(chats);
+    }
+
 }

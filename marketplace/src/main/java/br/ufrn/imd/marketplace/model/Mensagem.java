@@ -7,16 +7,16 @@ public class Mensagem {
     private int usuarioId;
     private int chatId;
     private String texto;
-    private Timestamp data_criacao;
+    private Timestamp data_hora;
 
     public Mensagem() {}
 
-    public Mensagem(int id, int usuarioId, int chatId, String texto, Timestamp data_criacao) {
+    public Mensagem(int id, int usuarioId, int chatId, String texto, Timestamp data_hora) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.chatId = chatId;
         this.texto = texto;
-        this.data_criacao = data_criacao;
+        this.data_hora = data_hora;
     }
 
     public int getId() {
@@ -27,8 +27,8 @@ public class Mensagem {
         return texto;
     }
 
-    public Timestamp getDataCriacao() {
-        return data_criacao;
+    public Timestamp getDataHora() {
+        return data_hora;
     }
     public int getUsuarioId() {
         return usuarioId;
@@ -42,8 +42,8 @@ public class Mensagem {
     public void setTexto(String texto) {
         this.texto = texto;
     }
-    public void setDataCriacao(Timestamp data_criacao) {
-        this.data_criacao = data_criacao;
+    public void setDataHora(Timestamp data_hora) {
+        this.data_hora = data_hora;
     }
     public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;

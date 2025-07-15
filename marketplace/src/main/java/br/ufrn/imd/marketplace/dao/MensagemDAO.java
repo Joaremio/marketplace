@@ -31,7 +31,7 @@ public class MensagemDAO {
 
     public List<Mensagem> buscarMensagensPorChatId(int chatId) throws SQLException {
         List<Mensagem> mensagens = new ArrayList<>();
-        String sql = "SELECT * FROM mensagem WHERE chat_id = ? ORDER BY data_criacao ASC";
+        String sql = "SELECT * FROM mensagem WHERE chat_id = ? ORDER BY data_hora ASC";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, chatId);
@@ -42,7 +42,7 @@ public class MensagemDAO {
                 msg.setChatId(rs.getInt("chat_id"));
                 msg.setUsuarioId(rs.getInt("usuario_id"));
                 msg.setTexto(rs.getString("texto"));
-                msg.setDataCriacao(rs.getTimestamp("data_criacao"));
+                msg.setDataHora(rs.getTimestamp("data_hora"));
                 mensagens.add(msg);
             }
         }
